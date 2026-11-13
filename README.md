@@ -20,8 +20,8 @@ Status reviewed against the local source and packaging artifacts on **November 1
 | Audio | Output is implemented through the 3DS DSP. Emulator slowdowns can also affect audio playback. |
 | Controls | Circle Pad movement, C-stick camera and configurable physical button mappings are implemented. |
 | Saves | The game uses an SD-backed memory-card implementation. Save-related failures have been reported; keep backups. |
-| Rendering | The GX-to-PICA renderer is operational. Real-hardware depth, sky, cloud and other rendering faults remain under investigation. |
-| Performance | Retained geometry, resident packed geometry and allocation pools are implemented. Heavy scenes remain slow on hardware. |
+| Rendering | The GX-to-PICA renderer is operational. On real hardware, fogged scenes draw far geometry (ocean, cliffs) over near geometry: the console's W-buffer depth mode stores far smaller values than Azahar does. A Z-buffer experiment (`depth_z=1`, fog off) is being tested on hardware; see [docs/CONSOLE_FINDINGS.md](docs/CONSOLE_FINDINGS.md). A noisy cloud strip on the horizon is also open (texture data has been ruled out). |
+| Performance | About 10–12 FPS in Outset gameplay on a New 3DS (build v92). Model draws going through the emulated GameCube command stream are the main cost; a direct model path is in development. See [docs/PERFORMANCE.md](docs/PERFORMANCE.md). |
 | Bottom-screen map | An experimental routing backend exists. The redesigned shortcut panel and its transitions are not yet a finished player-facing feature. |
 | Optional QoL | A startup configuration loader is implemented for existing sailing, grappling, song-replay and text hooks; gameplay validation is pending. |
 | Gyro aiming | Sensor and aiming functions are linked in the current local packaged ELF. Physical direction, drift and aiming behaviour remain unvalidated on hardware. |
@@ -60,6 +60,7 @@ SD card
         ├── ww_bundle_title.bin     # Locally prepared title material bundle
         ├── ww_bundle*.bin          # Any additional locally prepared bundles
         ├── ww_bundle_misses.bin    # Created/grown by the game
+        ├── ww_texpack.bin          # Optional: textures converted on a PC (about 289 MB); no measured speed gain yet
         ├── user/                  # Saves: preserve when updating
         ├── buttons.ini            # Optional physical remapping
         ├── shortcuts.ini          # Optional shortcut assignments; feature-dependent
@@ -88,7 +89,7 @@ The default physical mapping is:
 | D-pad | D-pad |
 | SELECT + START | Z, suppressing the individual START action |
 
-SELECT alone is unassigned as a game action; some development builds use it for diagnostic captures. Consult that build’s notes.
+SELECT alone is unassigned as a game action; development builds use it to save a diagnostic capture (colour, depth and, on the first press, the textures in use) to `/3ds/ww3ds/`. Consult that build’s notes.
 
 Physical remapping uses `/3ds/ww3ds/buttons.ini`. For example:
 
@@ -156,7 +157,7 @@ Reported numbers must distinguish:
 - **Emulated/virtual FPS:** timing inside the emulated console.
 - **Host FPS and emulation speed:** what the emulator actually delivers on the PC.
 
-These are not interchangeable. Heavy Outset scenes have produced roughly **3–6 FPS on real hardware in earlier development builds**, despite much higher virtual results in Azahar. Later emulator improvements have not yet established equivalent console gains.
+These are not interchangeable. On a physical New 3DS, Outset gameplay runs at about **10–12 FPS** (build v92), while Azahar reports about 26 virtual FPS for a comparable scene. Earlier builds ran heavy Outset scenes at 3–6 FPS on hardware. [docs/PERFORMANCE.md](docs/PERFORMANCE.md) has the per-frame breakdown, what has been tried, and the plan.
 
 Current structural work includes retained decoded geometry, resident packed buffers, allocation pools and memory reductions intended to preserve overlap between processing and rendering. Experimental settings are build-dependent; avoid copying an old `performance.ini` wholesale into a newer build.
 
