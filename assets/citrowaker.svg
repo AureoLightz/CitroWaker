@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="300" viewBox="0 0 1200 300" role="img" aria-labelledby="title desc">
+<title id="title">CitroWaker</title><desc id="desc">A native Wind Waker port for New Nintendo 3DS. Original typographic project banner.</desc>
+<rect width="1200" height="300" rx="16" fill="#102c43"/>
+<path d="M0 252 Q150 222 300 252 T600 252 T900 252 T1200 252" fill="none" stroke="#2c687e" stroke-width="2"/>
+<path d="M0 270 Q150 240 300 270 T600 270 T900 270 T1200 270" fill="none" stroke="#204c66" stroke-width="2"/>
+<text x="600" y="76" text-anchor="middle" font-family="Arial,sans-serif" font-size="15" letter-spacing="5" fill="#bed8e0">THE GREAT SEA, ON TWO SCREENS</text>
+<text x="600" y="173" text-anchor="middle" font-family="Georgia,serif" font-weight="bold" font-size="91" letter-spacing="-3"><tspan fill="#c3df79">Citro</tspan><tspan fill="#fff4cf">Waker</tspan></text>
+<text x="600" y="217" text-anchor="middle" font-family="Arial,sans-serif" font-size="20" fill="#d9e8ed">A native Wind Waker port for New Nintendo 3DS</text>
+</svg>

@@ -1,6 +1,6 @@
 # Real New 3DS vs. Azahar: findings
 
-Things the physical console does differently from the Azahar emulator, found while bringing Project Windfall up on hardware. Each was invisible in the emulator, so an emulator pass alone cannot rule any of them out. They may be useful to other 3DS homebrew developers.
+Things the physical console does differently from the Azahar emulator, found while bringing CitroWaker up on hardware. Each was invisible in the emulator, so an emulator pass alone cannot rule any of them out. They may be useful to other 3DS homebrew developers.
 
 Status: November 12, 2026. Each entry says how it was found and how sure we are.
 
