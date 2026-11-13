@@ -6,7 +6,11 @@ Project Windfall adapts the original GameCube game through the Wind Waker decomp
 
 **This is an active development project, not a finished release.** It boots on real New Nintendo 3DS hardware, but performance and graphical correctness still need substantial work. Completing the whole game has not been verified.
 
+**Repository scope:** this is currently a documentation-only repository. It does not contain the game source, build scripts, CIAs or an asset-preparation tool. The implementation described below exists in the local development tree; cloning this repository alone cannot build or run it.
+
 No game disc image, extracted Nintendo assets or Nintendo music is provided by this repository. You must supply your own compatible game data.
+
+Status reviewed against the local source and packaging artifacts on **November 12, 2026**. Build-specific validation is noted separately.
 
 ## What works—and what still needs work
 
@@ -20,7 +24,7 @@ No game disc image, extracted Nintendo assets or Nintendo music is provided by t
 | Performance | Retained geometry, resident packed geometry and allocation pools are implemented. Heavy scenes remain slow on hardware. |
 | Bottom-screen map | An experimental routing backend exists. The redesigned shortcut panel and its transitions are not yet a finished player-facing feature. |
 | Optional QoL | A startup configuration loader is implemented for existing sailing, grappling, song-replay and text hooks; gameplay validation is pending. |
-| Gyro aiming | Sensor and aiming integration is implemented in source. Physical direction, drift, feel and ARM qualification remain pending. |
+| Gyro aiming | Sensor and aiming functions are linked in the current local packaged ELF. Physical direction, drift and aiming behaviour remain unvalidated on hardware. |
 | Top-screen HUD fitting | A default-off source candidate exists; final placement and cost need in-game validation. |
 
 “Implemented in source” does **not** mean a feature is present in every previously distributed CIA. Check the notes accompanying the specific build you install.
