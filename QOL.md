@@ -1,6 +1,6 @@
 # Optional QoL and gyro controls
 
-Implementation exists in the local development tree; this GitHub repository currently contains documentation only. The current local packaged ELF contains the gyro sensor and aiming functions, but their inclusion does not establish correct aiming behaviour. Gameplay and physical sensor validation remain pending. Check the notes for your specific build; there is no downloadable release in this repository yet.
+Implementation exists in the local development tree; this GitHub repository does not yet include the port source or a downloadable release. The current local packaged ELF contains the gyro sensor and aiming functions, but their inclusion does not establish correct aiming behaviour. Gameplay and physical sensor validation remain pending. Check the notes for your specific build; there is no downloadable release in this repository yet.
 
 An optional `/3ds/ww3ds/qol.ini` is read once at controller startup. Example:
 

@@ -6,7 +6,7 @@ CitroWaker adapts the original GameCube game through the Wind Waker decompilatio
 
 **This is an active development project, not a finished release.** It boots on real New Nintendo 3DS hardware, but performance and graphical correctness still need substantial work. Completing the whole game has not been verified.
 
-**Repository scope:** this is currently a documentation-only repository. It does not contain the game source, build scripts, CIAs or an asset-preparation tool. The implementation described below exists in the local development tree; cloning this repository alone cannot build or run it.
+**Repository scope:** this is currently a documentation and showcase-tools repository. It does not contain the game source, build scripts, CIAs or an asset-preparation tool. The implementation described below exists in the local development tree; cloning this repository alone cannot build or run it.
 
 No game disc image, extracted Nintendo assets or Nintendo music is provided by this repository. You must supply your own compatible game data.
 
@@ -161,7 +161,7 @@ These are not interchangeable. On a physical New 3DS, Outset gameplay runs at ab
 
 Current structural work includes retained decoded geometry, resident packed buffers, allocation pools and memory reductions intended to preserve overlap between processing and rendering. Experimental settings are build-dependent; avoid copying an old `performance.ini` wholesale into a newer build.
 
-See the development performance log (not included in this documentation-only repository yet) for development evidence. Private candidates and PC-only memory measurements are not shipped performance claims.
+See the development performance log (not included in this documentation and showcase-tools repository yet) for development evidence. Private candidates and PC-only memory measurements are not shipped performance claims.
 
 ## Building from source
 

@@ -1,6 +1,6 @@
 # Touch shortcuts
 
-**Development status:** this describes the implemented configuration contract and intended panel behaviour. The latest shortcut panel still needs renderer integration and in-game validation. Editing this file alone does not make the buttons appear. This GitHub repository currently contains documentation only.
+**Development status:** this describes the implemented configuration contract and intended panel behaviour. The latest shortcut panel still needs renderer integration and in-game validation. Editing this file alone does not make the buttons appear. This GitHub repository does not yet include the port source or a downloadable release.
 
 The intended bottom buttons stay **Menu** (left) and **Map zoom** (right). Map zoom cycles the game's normal minimap show/zoom states. These two buttons cannot be replaced with item shortcuts.
 

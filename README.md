@@ -46,7 +46,7 @@ The aim is to preserve the original game's world, effects and behaviour while ma
 | Rendering and performance | Working renderer, with remaining hardware depth, cloud and other visual faults. Heavy scenes still need optimization. |
 | Saves | SD-backed memory cards are implemented; save-related failures have been reported. Preserve backups. |
 | Touchscreen and QoL | Map routing, customizable shortcut configuration, optional QoL and gyro aiming are development features. Integration and hardware validation vary by feature. |
-| Releases and source | This repository currently hosts documentation and showcase images. No downloadable CIA or self-contained source/build release is published here yet. |
+| Releases and source | This repository currently hosts documentation, showcase images and an offline timing-overlay tool. No downloadable CIA or self-contained source/build release is published here yet. |
 
 See the [measured performance notes](docs/PERFORMANCE.md) and [console findings](docs/CONSOLE_FINDINGS.md) for build-specific evidence. Emulator timing is kept separate from real-console FPS.
 
@@ -74,6 +74,10 @@ For an experimental build you already have:
 - **Optional conveniences:** sailing, grappling, text and song-replay hooks; gyro aiming is opt-in and still needs physical sensor validation.
 
 Read [QoL and gyro configuration](QOL.md) and [touch shortcut status](SHORTCUTS.md) before relying on an experimental feature. Source implementation alone does not mean every previously distributed CIA includes it.
+
+## Cutscene showcase tool
+
+A [standalone Python + FFmpeg tool](tools/showcase/README.md) adds a measured frame-time graph and FPS counter below recorded footage. The requested late-game Ganondorf showcase still needs a verified capture; no Ganondorf footage is claimed here. Emulator, console and host timing are explicitly distinguished.
 
 ## What's next
 
