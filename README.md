@@ -77,7 +77,11 @@ Read [QoL and gyro configuration](QOL.md) and [touch shortcut status](SHORTCUTS.
 
 ## Cutscene showcase tool
 
-A [standalone Python + FFmpeg tool](tools/showcase/README.md) adds a measured frame-time graph and FPS counter below recorded footage. The requested late-game Ganondorf showcase still needs a verified capture; no Ganondorf footage is claimed here. Emulator, console and host timing are explicitly distinguished.
+A [standalone Python + FFmpeg tool](tools/showcase/README.md) adds a measured frame-time graph and FPS counter below recorded footage. The game's ending cutscene now boots and renders in the port; the Ganondorf battle has not been captured yet. Emulator, console and host timing are explicitly distinguished.
+
+<p align="center"><img src="assets/ending-timing.png" alt="Link and Tetra waving at the camera in the ending cutscene, running in the 3DS port in Azahar, with the frame-time graph below" width="80%"></p>
+
+*The ending cutscene in Azahar with the overlay's frame-time footer. Timing is emulator ("virtual") timing, about 29.4 FPS on average for this scene; the real console is slower.*
 
 ## What's next
 
