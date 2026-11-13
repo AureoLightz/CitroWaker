@@ -6,7 +6,7 @@ No ISO, extracted game payload, generated material/texture pack, Nintendo music,
 
 Prepared for publication:
 
-- Replaced author/committer email metadata with the owner's GitHub no-reply address, preserving historical file trees and commit messages.
+- Removed author/committer email addresses entirely, preserving historical file trees and commit messages.
 - Added ignore rules for game data, generated assets, build products and private diagnostics.
 - Documented repository scope and the absence of a blanket open-source licence.
 - Corrected historical hardware explanations that had been stated too confidently, including the disproved unused-texture-unit hang theory.
