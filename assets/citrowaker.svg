@@ -1,9 +1,24 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="300" viewBox="0 0 1200 300" role="img" aria-labelledby="title desc">
-<title id="title">CitroWaker</title><desc id="desc">A native Wind Waker port for New Nintendo 3DS. Original typographic project banner.</desc>
-<rect width="1200" height="300" rx="16" fill="#102c43"/>
-<path d="M0 252 Q150 222 300 252 T600 252 T900 252 T1200 252" fill="none" stroke="#2c687e" stroke-width="2"/>
-<path d="M0 270 Q150 240 300 270 T600 270 T900 270 T1200 270" fill="none" stroke="#204c66" stroke-width="2"/>
-<text x="600" y="76" text-anchor="middle" font-family="Arial,sans-serif" font-size="15" letter-spacing="5" fill="#bed8e0">THE GREAT SEA, ON TWO SCREENS</text>
-<text x="600" y="173" text-anchor="middle" font-family="Georgia,serif" font-weight="bold" font-size="91" letter-spacing="-3"><tspan fill="#c3df79">Citro</tspan><tspan fill="#fff4cf">Waker</tspan></text>
-<text x="600" y="217" text-anchor="middle" font-family="Arial,sans-serif" font-size="20" fill="#d9e8ed">A native Wind Waker port for New Nintendo 3DS</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="380" viewBox="0 0 1280 380" role="img" aria-labelledby="title desc">
+<title id="title">CitroWaker</title>
+<desc id="desc">The Great Sea, on two screens. An experimental native Wind Waker port for New Nintendo 3DS.</desc>
+<defs>
+ <linearGradient id="sea" x2="0" y2="1"><stop stop-color="#123d59"/><stop offset="1" stop-color="#076c87"/></linearGradient>
+ <radialGradient id="light"><stop stop-color="#33899a" stop-opacity=".4"/><stop offset="1" stop-color="#33899a" stop-opacity="0"/></radialGradient>
+ <linearGradient id="ink" x2="0" y2="1"><stop stop-color="#fff9e7"/><stop offset="1" stop-color="#e3edcf"/></linearGradient>
+</defs>
+<rect width="1280" height="380" rx="20" fill="url(#sea)"/>
+<ellipse cx="640" cy="170" rx="670" ry="300" fill="url(#light)"/>
+<g fill="none" stroke="#97d9d1" stroke-width="2" opacity=".18">
+ <path d="M-45 127C25 3 185 24 192 112C199 196 77 201 75 134C74 89 137 84 137 125C137 148 109 149 109 133"/>
+ <path d="M1305 190C1220 64 1071 86 1073 170C1075 244 1180 248 1183 189C1186 148 1132 139 1130 178C1129 197 1154 202 1156 183"/>
+ <path d="M-10 300Q70 277 150 300T310 300T470 300T630 300T790 300T950 300T1110 300T1270 300T1430 300"/>
+ <path d="M-90 319Q-10 296 70 319T230 319T390 319T550 319T710 319T870 319T1030 319T1190 319T1350 319"/>
+</g>
+<g fill="#092e48" opacity=".65"><path d="M0 344L0 322L65 322L92 302L121 309L154 337L225 344Z"/><path d="M1080 350L1120 324L1150 326L1169 299L1200 307L1224 331L1280 333L1280 380L1080 380Z"/></g>
+<text x="640" y="71" text-anchor="middle" font-family="Arial,sans-serif" font-size="15" font-weight="bold" letter-spacing="5" fill="#9ddbd6">THE GREAT SEA. TWO SCREENS.</text>
+<text x="640" y="205" text-anchor="middle" font-family="Georgia,serif" font-weight="bold" font-size="118" letter-spacing="-5" fill="#072d43" transform="translate(0 6)">CitroWaker</text>
+<text x="640" y="205" text-anchor="middle" font-family="Georgia,serif" font-weight="bold" font-size="118" letter-spacing="-5" fill="url(#ink)">CitroWaker</text>
+<path d="M579 231H701" stroke="#f57c60" stroke-width="5" stroke-linecap="round"/>
+<text x="640" y="274" text-anchor="middle" font-family="Arial,sans-serif" font-size="21" fill="#e4f3ea">The Wind Waker, reworked for New Nintendo 3DS.</text>
+<text x="640" y="350" text-anchor="middle" font-family="Arial,sans-serif" font-size="13" font-weight="bold" letter-spacing="3" fill="#9ddbd6">NATIVE CODE   /   TWO SCREENS   /   A COMMUNITY PORT</text>
 </svg>
