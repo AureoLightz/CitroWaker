@@ -93,4 +93,4 @@ The [development guide](docs/DEVELOPMENT.md) covers the current build arrangemen
 
 [zeldaret/tww](https://github.com/zeldaret/tww) · [SwitchWaker](https://github.com/centollOS/SwitchWaker) · [Aurora](https://github.com/encounter/aurora) · [devkitPro](https://devkitpro.org/) · [Azahar](https://github.com/azahar-emu/azahar)
 
-*The Legend of Zelda and The Wind Waker belong to Nintendo. CitroWaker is an independent community project and is not affiliated with or endorsed by Nintendo. Screenshots contain game imagery; no licence over Nintendo's assets is granted. Upstream components retain their own licences.*
+*The Legend of Zelda and The Wind Waker belong to Nintendo. CitroWaker is an independent community project and is not affiliated with or endorsed by Nintendo. Screenshots contain game imagery; no licence over Nintendo's assets is granted. Upstream components retain their own licences. See [repository scope and rights](RIGHTS.md).*

@@ -2,7 +2,7 @@
 
 Things the physical console does differently from the Azahar emulator, found while bringing CitroWaker up on hardware. Each was invisible in the emulator, so an emulator pass alone cannot rule any of them out. They may be useful to other 3DS homebrew developers.
 
-Status: November 12, 2026. Each entry says how it was found and how sure we are.
+Reviewed November 13, 2026. These are observations from this port and its tested builds, not universal hardware guarantees. Earlier explanations were hypotheses unless independently confirmed.
 
 ## GPU depth
 
@@ -24,11 +24,15 @@ Status: November 12, 2026. Each entry says how it was found and how sure we are.
 
 ## Threads and boot
 
-- **Core 1 refuses threads above priority 0x30,** and every refused `svcCreateThread` uses up one of the 32 thread slots. Do not retry in a loop.
-- **The 124 MB memory mode needs `NS_RebootToTitle(..., 6)`** when the title is not started from the HOME Menu.
-- **Enabling texture units 1/2 with no texture coordinates hangs the GPU** on the first textured draw. Write the real unit mask after citro3d's context update.
-- **A 3D model (CGFX) banner crashed the HOME Menu.** Use an image banner.
+- **Core-1 priority and thread-limit failures were observed during bring-up.** Avoid repeatedly retrying a failed placement; the port falls back after a refusal. The reported slot exhaustion does not by itself establish a universal kernel leak on every failed `svcCreateThread`.
+- **Some launches received only 64 MB despite the extended-memory header.** A reboot-into-title fallback recovered the larger memory allocation in the tested runs. This does not mean every non-HOME launch universally requires that fallback.
+- **Unused texture units were investigated as a GPU-hang hypothesis, then ruled out by a subsequent console test.** Reducing the enabled-unit mask did not resolve that hang. Do not cite this earlier theory as an established cause.
+- **The earlier custom CGFX banner crashed the HOME Menu.** The packaging fallback uses the standard image-banner template. This finding concerns that particular asset, not all 3D HOME banners; a new custom conversion needs real-HOME validation.
 
 ## Performance
 
 Azahar's per-frame timings were a poor predictor of console timings for this workload. A typical heavy frame cost about 3× more on the console. Two optimisations that looked neutral or positive in the emulator did not help on hardware. Decisions about performance are made from console logs.
+
+## Latest reviewed console result: v93
+
+With `depth_z=1` (fog disabled), the observed colour capture places the dock, Link and island correctly in front of the sea. The rainbow-speckle horizon band remains open. The SELECT depth readback was suspected to contain stale memory and is being corrected; do not derive a hardware formula from that image. This is a scene-specific result, not full-game rendering validation.

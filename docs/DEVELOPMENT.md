@@ -214,7 +214,7 @@ For a bug report, include the build identifier, console/emulator details, scene 
 
 ## Repository contents and licensing
 
-This page does not establish a licence for the entire project. Upstream components retain their own licences and notices. A source and asset audit is required before public publication, including any files derived from upstream game code.
+This page does not establish a licence for the entire project. Upstream components retain their own licences and notices. The November 13 publication audit covers this documentation/showcase-tools repository only. The local port source, packaging assets and generated game data require their own audit before any later upload. See [scope and rights](../RIGHTS.md).
 
 Keep out of the public repository and its history:
 
