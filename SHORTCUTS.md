@@ -1,6 +1,6 @@
 # Touch shortcuts
 
-**Development status:** this describes the implemented configuration contract and intended panel behaviour. The latest shortcut panel still needs renderer integration and in-game validation. Editing this file alone does not make the buttons appear. This GitHub repository does not yet include the port source or a downloadable release.
+**Development status:** this describes the implemented configuration contract and intended panel behaviour. The latest shortcut panel still needs renderer integration and in-game validation. Editing this file alone does not make the buttons appear. The original layout, gesture, visibility and configuration headers are now published in [platform/n3ds](platform/n3ds), but the full in-game integration and a downloadable release are not included.
 
 The intended bottom buttons stay **Menu** (left) and **Map zoom** (right). Map zoom cycles the game's normal minimap show/zoom states. These two buttons cannot be replaced with item shortcuts.
 

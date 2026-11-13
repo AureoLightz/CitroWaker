@@ -1,6 +1,6 @@
 # Repository scope and rights
 
-This repository currently contains project documentation, one original typographic SVG, three development gameplay screenshots, and the standalone Python timing-overlay tool with its tests. It is not the source release or an installable release of the 3DS port.
+This repository contains selected original 3DS platform components, a local setup app, console-report/showcase tools, tests and project documentation, plus one original typographic SVG and three development gameplay screenshots. It is not the complete source release or an installable release of the 3DS port. See docs/SOURCE.md for exact scope.
 
 ## Included imagery
 
@@ -8,9 +8,9 @@ The two Outset images and ending-cutscene still are gameplay captures, included 
 
 ## Licensing status
 
-No blanket open-source licence is granted by this repository. Public visibility permits inspection; it does not turn every included work into freely reusable material. The project's original tooling/documentation still needs an explicit licence selection by its owner before it is advertised as open-source software. No licence or ownership is claimed over Nintendo material or upstream projects.
+The root [MIT licence](LICENSE) applies to project-original source, tests, tooling, documentation and the original SVG. It does not grant rights over Nintendo game imagery inside the screenshots, game assets or upstream software. Those works retain their respective rights and licensing terms. No extracted game artwork or music is included in this source batch.
 
-The port builds on zeldaret/tww, SwitchWaker, Aurora and devkitPro components. Their code is not bundled in this documentation repository. Any future source/dependency publication must preserve the applicable upstream licences and notices and be reviewed separately.
+The port builds on zeldaret/tww, SwitchWaker, Aurora and devkitPro components. Their implementation and SDK code are not bundled in this component snapshot. Any future source/dependency publication must preserve the applicable upstream licences and notices and be reviewed separately.
 
 ## Keep local
 

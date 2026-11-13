@@ -14,7 +14,7 @@
   <a href="docs/DEVELOPMENT.md">Development guide</a>
 </p>
 
-> **In development.** Gameplay runs on real New 3DS hardware. Rendering, performance and stability work continues; full-game completion is unverified. This repository publishes documentation and showcase tools, with no downloadable game build yet.
+> **In development.** Gameplay runs on real New 3DS hardware. Rendering, performance and stability work continues; full-game completion is unverified. Selected source components and tools are now available below; there is no downloadable game build yet.
 
 ## The project
 
@@ -58,7 +58,7 @@ Optional sailing, grappling, text and song-replay hooks are implemented in the d
 | **Performance** | Heavy scenes need optimization. Hardware measurements guide the work; emulator FPS is reported separately. |
 | **Saving** | SD-backed memory cards are implemented. Save-related failures have been reported; keep backups. |
 | **Touch & QoL** | Development features with differing integration and validation status. Design previews are not proof of shipped functionality. |
-| **Release** | Documentation, showcase images and an offline timing-overlay tool are available here. No CIA or self-contained port source release yet. |
+| **Release** | Original platform components, setup/report/showcase tools and host tests are published. No CIA or complete port source release yet. |
 
 [Measured performance →](docs/PERFORMANCE.md) &nbsp; · &nbsp; [Console findings →](docs/CONSOLE_FINDINGS.md)
 
@@ -70,9 +70,22 @@ Optional sailing, grappling, text and song-replay hooks are implemented in the d
 
 PC-side game-data preparation and a direct model-rendering path are being explored. They are development work, not promised speedups.
 
+## Try the published code
+
+The first reviewed source components are available now:
+
+| Component | Start here |
+| :--- | :--- |
+| **Local PC setup app** | [Windows/Linux source and launchers](tools/setup) — prepare an SD-ready folder using separately supplied compatible release tools and data. |
+| **3DS platform code** | [NDSP audio, touch/lifecycle logic and configuration](platform/n3ds) — asset-free components from the port. |
+| **Console log reports** | [Summarize and compare timings](tools/console-report) — no game or emulator required. |
+| **Host tests** | Run `python3 tests/run.py` with Python 3.10+ and a C++17 compiler; use `--python-only` for the Python tests. |
+
+[Source scope, dependencies & licence →](docs/SOURCE.md)
+
 ## Getting started
 
-**There is no public build to download yet.** This page documents the project and the experimental builds already in testing; it is not a fresh-clone build of the port.
+**There is no public build to download yet.** This page documents the project and the experimental builds already in testing; the published components do not yet build the complete port.
 
 For a compatible experimental CIA you already have:
 
@@ -118,4 +131,4 @@ Bug reports are most useful with the build identifier, console/emulator details,
   <a href="https://github.com/azahar-emu/azahar">Azahar</a>
 </p>
 
-<sub>The Legend of Zelda and The Wind Waker belong to Nintendo. CitroWaker is an independent community project, not affiliated with or endorsed by Nintendo. Screenshots contain game imagery; no licence over Nintendo assets is granted. See [repository scope and rights](RIGHTS.md).</sub>
+<sub>The Legend of Zelda and The Wind Waker belong to Nintendo. CitroWaker is an independent community project, not affiliated with or endorsed by Nintendo. Screenshots contain game imagery; original project code is MIT-licensed, with no licence over Nintendo assets granted. See [repository scope and rights](RIGHTS.md).</sub>

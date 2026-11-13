@@ -1,0 +1,139 @@
+{
+  "snapshot_date": "2026-11-13",
+  "scope": "Project-original code snapshot; does not include game, renderer, SDK or game-derived assets",
+  "files": [
+    {
+      "path": "tools/setup/app.py",
+      "source_component": "tools/windfall_setup/app.py",
+      "source_sha256": "6c73af9ad96c9ae15cec1b42b13d801d5f00e46abc41042ee3665ebeaaffe5d4",
+      "publication_changes": "CitroWaker branding; explicit missing-release/licence notes; Windows-safe bundle-name validation; reject non-object API requests; matching synthetic tests",
+      "published_sha256": "ca7246c8e58b56ed004db2ab1aa07f9e38a345b15e4f072f49acd4c985eae820"
+    },
+    {
+      "path": "tools/setup/prepare.py",
+      "source_component": "tools/windfall_setup/prepare.py",
+      "source_sha256": "4653ab11c6fbf4e3618a42d4a5d21abf2034b7861b43e347df98389e37985294",
+      "publication_changes": "CitroWaker branding; explicit missing-release/licence notes; Windows-safe bundle-name validation; reject non-object API requests; matching synthetic tests",
+      "published_sha256": "1db39fa6efd9dbdaed0210e5ab9cdc3d1809a7a350159600ae7d00ab31d78149"
+    },
+    {
+      "path": "tools/setup/index.html",
+      "source_component": "tools/windfall_setup/index.html",
+      "source_sha256": "5a4224e2a0623c2a93fff2a67bd70179c7a6520995ce4a77ad4ad79cb38563f1",
+      "publication_changes": "CitroWaker branding; explicit missing-release/licence notes; Windows-safe bundle-name validation; reject non-object API requests; matching synthetic tests",
+      "published_sha256": "22b0ddf5a6c91a3f8fd03b70fe4c18db46b08481416c2e57e09adf1b64c08824"
+    },
+    {
+      "path": "tools/setup/launch.sh",
+      "source_component": "tools/windfall_setup/launch.sh",
+      "source_sha256": "3960f3b88bde0405b8f072078dda4cfae211067c52b39813e106832416395dd4",
+      "publication_changes": "CitroWaker branding where applicable",
+      "published_sha256": "3960f3b88bde0405b8f072078dda4cfae211067c52b39813e106832416395dd4"
+    },
+    {
+      "path": "tools/setup/launch.cmd",
+      "source_component": "tools/windfall_setup/launch.cmd",
+      "source_sha256": "73603acd769d754943c3e3b32fc2d616c11a794b3fd5adcadc80c9087e1ad6dd",
+      "publication_changes": "CitroWaker branding where applicable",
+      "published_sha256": "73603acd769d754943c3e3b32fc2d616c11a794b3fd5adcadc80c9087e1ad6dd"
+    },
+    {
+      "path": "tools/setup/release.example.json",
+      "source_component": "tools/windfall_setup/release.example.json",
+      "source_sha256": "b105f3545912a6ce3c81ceb6645230d85a3e03746f6e789a901ea87de25e2174",
+      "publication_changes": "CitroWaker branding where applicable",
+      "published_sha256": "fb70b757c7647e161efb811830d87f53d55d64e3ab021acd6096e9a0be8c268b"
+    },
+    {
+      "path": "tools/setup/test_prepare.py",
+      "source_component": "tools/windfall_setup/test_prepare.py",
+      "source_sha256": "e7abc85ed233051fca03eea7dfb1ec6e9d22c138dedb46fbac2256fdc6061ead",
+      "publication_changes": "CitroWaker branding; explicit missing-release/licence notes; Windows-safe bundle-name validation; reject non-object API requests; matching synthetic tests",
+      "published_sha256": "fab109d6232a1be7b86741060379d7748c1e02c48625405d29b456b37e009807"
+    },
+    {
+      "path": "tools/setup/test_app.py",
+      "source_component": "tools/windfall_setup/test_app.py",
+      "source_sha256": "4d66aed1f18c19fb2341643c4ad5e0fa5711cda55e654445ef19d059ba6996da",
+      "publication_changes": "CitroWaker branding; explicit missing-release/licence notes; Windows-safe bundle-name validation; reject non-object API requests; matching synthetic tests",
+      "published_sha256": "052e1e140a01f9da2905d436646b465942e27ed5783fe233c6d18698cdeb2b13"
+    },
+    {
+      "path": "tools/setup/.gitignore",
+      "source_component": "tools/windfall_setup/.gitignore",
+      "source_sha256": "8d8142e4991133d10e9f3f05d85b416800e9cf19a9970a8ae61d2da472b01b13",
+      "publication_changes": "CitroWaker branding where applicable",
+      "published_sha256": "8d8142e4991133d10e9f3f05d85b416800e9cf19a9970a8ae61d2da472b01b13"
+    },
+    {
+      "path": "tools/setup/README.md",
+      "source_component": "tools/windfall_setup/README.md",
+      "source_sha256": "708b9ba8a5d859c6b729d39034aaedfde91c2aeb102c3593e1c955ab379d6b3d",
+      "publication_changes": "CitroWaker branding; explicit missing-release/licence notes; Windows-safe bundle-name validation; reject non-object API requests; matching synthetic tests",
+      "published_sha256": "aead6de6c8818198cc8c2a8e8674657aa6aea13b10bec3a2f69891c5aae0d49d"
+    },
+    {
+      "path": "tools/console-report/report.py",
+      "source_component": "bench/console/report.py",
+      "source_sha256": "efb14b84aee940193314c6da2a702b93dcfde86858a39c5679a1d10fe1955476",
+      "publication_changes": "none",
+      "published_sha256": "efb14b84aee940193314c6da2a702b93dcfde86858a39c5679a1d10fe1955476"
+    },
+    {
+      "path": "tools/console-report/test_report.py",
+      "source_component": "bench/console/test_report.py",
+      "source_sha256": "7ee1dfa6fecce1b51703286a45854291dc1f4829df05d4b9955957f75c8b5058",
+      "publication_changes": "none",
+      "published_sha256": "7ee1dfa6fecce1b51703286a45854291dc1f4829df05d4b9955957f75c8b5058"
+    },
+    {
+      "path": "platform/n3ds/audio_3ds.cpp",
+      "source_component": "src/audio_3ds.cpp",
+      "source_sha256": "d7eba3944a6bc2abfc21b179505f0e8da7b18257f0c2e7e7c7824b1ed67b54c6",
+      "publication_changes": "none",
+      "published_sha256": "d7eba3944a6bc2abfc21b179505f0e8da7b18257f0c2e7e7c7824b1ed67b54c6"
+    },
+    {
+      "path": "platform/n3ds/n3ds.h",
+      "source_component": "src/n3ds.h",
+      "source_sha256": "66892b2e45bdca26a70467bffaf479d4ca18c86bec588b93dd8e88415318e00d",
+      "publication_changes": "none",
+      "published_sha256": "66892b2e45bdca26a70467bffaf479d4ca18c86bec588b93dd8e88415318e00d"
+    },
+    {
+      "path": "platform/n3ds/qol_config_3ds.h",
+      "source_component": "src/qol_config_3ds.h",
+      "source_sha256": "dc57e165fe069bf072f84a390195c43e2fd0c3530f2f331c3530813429bc22f9",
+      "publication_changes": "none",
+      "published_sha256": "dc57e165fe069bf072f84a390195c43e2fd0c3530f2f331c3530813429bc22f9"
+    },
+    {
+      "path": "platform/n3ds/ui_lifecycle_3ds.h",
+      "source_component": "src/ui_lifecycle_3ds.h",
+      "source_sha256": "b49e300c8db242e3fc57bf834b1d44cb680fde776c5cd595240beabe2f6799e1",
+      "publication_changes": "none",
+      "published_sha256": "b49e300c8db242e3fc57bf834b1d44cb680fde776c5cd595240beabe2f6799e1"
+    },
+    {
+      "path": "platform/n3ds/ui_shortcuts_3ds.h",
+      "source_component": "src/ui_shortcuts_3ds.h",
+      "source_sha256": "442e0ab46294efe500df151ef1dcfed95e7e38477fa425b7e811cd0d7a796ceb",
+      "publication_changes": "none",
+      "published_sha256": "442e0ab46294efe500df151ef1dcfed95e7e38477fa425b7e811cd0d7a796ceb"
+    },
+    {
+      "path": "platform/n3ds/ui_shortcuts_api_3ds.h",
+      "source_component": "src/ui_shortcuts_api_3ds.h",
+      "source_sha256": "96c549ae006465612ec4bd436ce827c11da11b2aa015b3e54c05823dbe33f813",
+      "publication_changes": "none",
+      "published_sha256": "96c549ae006465612ec4bd436ce827c11da11b2aa015b3e54c05823dbe33f813"
+    },
+    {
+      "path": "platform/n3ds/ui_shortcut_config_3ds.h",
+      "source_component": "src/ui_shortcut_config_3ds.h",
+      "source_sha256": "9c6efc75e9a02cbc49c652ca6398544495d7c9b0a7c3277ea4c22d89d902c5d1",
+      "publication_changes": "none",
+      "published_sha256": "9c6efc75e9a02cbc49c652ca6398544495d7c9b0a7c3277ea4c22d89d902c5d1"
+    }
+  ]
+}

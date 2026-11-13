@@ -15,3 +15,7 @@ Prepared for publication:
 This review covers this documentation/showcase-tools repository only. The separate local game source, renderer, packaging tree and new game-derived Master Sword presentation assets are not cleared for upload by this audit. Do not merge an entire local workspace into this repository.
 
 Future publication of source, binaries or dependencies needs its own provenance/licence and asset review. Repository visibility remains the owner's decision. Rewritten commits may still exist in GitHub caches or previously made clones; changing the branch history does not guarantee erasure of old metadata everywhere.
+
+## First source batch follow-up
+
+The owner subsequently authorized selected original source publication and delegated licence choice; original code/docs/tooling use MIT. The setup app, console-report tool and asset-free platform components were reviewed separately, with their provenance/snapshot hashes recorded in docs/SOURCE_MANIFEST.json. Tests use synthetic inputs; no game payload, native converter, extracted art or private configuration is added. See docs/SOURCE.md for dependencies and the distinction between usable components and the complete port.

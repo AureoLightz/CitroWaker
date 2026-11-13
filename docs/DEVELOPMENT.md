@@ -6,7 +6,7 @@ CitroWaker adapts the original GameCube game through the Wind Waker decompilatio
 
 **This is an active development project, not a finished release.** It boots on real New Nintendo 3DS hardware, but performance and graphical correctness still need substantial work. Completing the whole game has not been verified.
 
-**Repository scope:** this is currently a documentation and showcase-tools repository. It does not contain the game source, build scripts, CIAs or an asset-preparation tool. The implementation described below exists in the local development tree; cloning this repository alone cannot build or run it.
+**Repository scope:** selected original platform components, a local setup app, reporting/showcase tools and host tests are published. See [source scope](SOURCE.md). The full game, renderer, build scripts and CIAs are not included; cloning this repository alone cannot build or run the complete port. The full-port arrangement described below remains in the local development tree.
 
 No game disc image, extracted Nintendo assets or Nintendo music is provided by this repository. You must supply your own compatible game data.
 
@@ -214,7 +214,7 @@ For a bug report, include the build identifier, console/emulator details, scene 
 
 ## Repository contents and licensing
 
-This page does not establish a licence for the entire project. Upstream components retain their own licences and notices. The November 13 publication audit covers this documentation/showcase-tools repository only. The local port source, packaging assets and generated game data require their own audit before any later upload. See [scope and rights](../RIGHTS.md).
+Original components published here use the root MIT licence; that does not establish a licence for the entire local port. Upstream components retain their own licences and notices. The November 13 publication audit and subsequent component-source review cover the files actually published here only. The local port source, packaging assets and generated game data require their own audit before any later upload. See [scope and rights](../RIGHTS.md).
 
 Keep out of the public repository and its history:
 
