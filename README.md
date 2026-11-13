@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/citrowaker.svg" alt="CitroWaker — The Great Sea. Two screens." width="100%">
+  <img src="assets/citrowaker-header.svg" alt="CitroWaker — The Great Sea. Two screens." width="100%">
 </p>
 
 <p align="center">
