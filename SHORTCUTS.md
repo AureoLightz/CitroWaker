@@ -1,6 +1,8 @@
 # Touch shortcuts
 
-The bottom buttons stay **Menu** (left) and **Map zoom** (right). Map zoom cycles the game's normal minimap show/zoom states. These two buttons cannot be replaced with item shortcuts.
+**Development status:** this describes the implemented configuration contract and intended panel behaviour. The latest shortcut panel still needs renderer integration and in-game validation. Editing this file alone does not make the buttons appear. This GitHub repository currently contains documentation only.
+
+The intended bottom buttons stay **Menu** (left) and **Map zoom** (right). Map zoom cycles the game's normal minimap show/zoom states. These two buttons cannot be replaced with item shortcuts.
 
 The three right-hand item shortcuts have fixed positions. Change their actions in `/3ds/ww3ds/shortcuts.ini`, then restart the game:
 
@@ -20,4 +22,4 @@ slot3.action = NONE
 
 Physical controller mappings stay in `buttons.ini`. Positions/sizes and footer reassignment are unsupported. The whole file is validated before applying it; a bad entry keeps defaults and writes one `[ui] shortcuts.ini rejected` line. The file is read once at startup, with no per-frame file access.
 
-Development status: the parser, input and presentation helper are host-tested. The shortcut-panel renderer and ARM validation are pending. The delivered v80/v81 minimap receiver alone does not make these shortcut buttons available yet.
+The parser, input and presentation helpers are host-tested. A minimap-routing backend alone does not make the redesigned shortcut buttons available.
