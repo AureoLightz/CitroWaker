@@ -76,16 +76,17 @@ The first reviewed source components are available now:
 
 | Component | Start here |
 | :--- | :--- |
-| **Local PC setup app** | [Windows/Linux source and launchers](tools/setup) — prepare an SD-ready folder using separately supplied compatible release tools and data. |
+| **Local PC setup app** | [Windows/Linux source and launchers](tools/setup) — bundled texture conversion; supply your existing compatible CIA and material bundles. |
 | **3DS platform code** | [NDSP audio, touch/lifecycle logic and configuration](platform/n3ds) — asset-free components from the port. |
+| **PC texture converter** | [Buildable extractor and converter](tools/texture-pack) — process your own ISO locally; no SDK needed. |
 | **Console log reports** | [Summarize and compare timings](tools/console-report) — no game or emulator required. |
 | **Host tests** | Run `python3 tests/run.py` with Python 3.10+ and a C++17 compiler; use `--python-only` for the Python tests. |
 
-[Source scope, dependencies & licence →](docs/SOURCE.md)
+[Source scope, dependencies & licence →](docs/SOURCE.md) &nbsp; · &nbsp; [Player-release progress →](docs/PLAYER_RELEASE.md)
 
 ## Getting started
 
-**There is no public build to download yet.** This page documents the project and the experimental builds already in testing; the published components do not yet build the complete port.
+**PC preparation is working; the public CIA is not ready yet.** See [the player-install guide and release gates](docs/PLAYER_RELEASE.md). This page documents the project and the experimental builds already in testing; the published components do not yet build the complete port.
 
 For a compatible experimental CIA you already have:
 

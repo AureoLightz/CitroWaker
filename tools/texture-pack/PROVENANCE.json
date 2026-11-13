@@ -1,0 +1,68 @@
+{
+  "snapshot_date": "2026-11-13",
+  "project_original": [
+    {
+      "file": "src/texconv.cpp",
+      "sha256": "56239edac80d73f0232b7e33dbf9792fdf61ddc5bafe6c804c05aaabc40e2753",
+      "origin": "project renderer/src/texconv.cpp",
+      "changes": "none"
+    },
+    {
+      "file": "src/texconv.h",
+      "sha256": "514ad7bb1b7ecbfb74675682df2d26bd08c7659b637dc6f6a8c5c7f498507d1b",
+      "origin": "project renderer/src/texconv.h",
+      "changes": "none"
+    },
+    {
+      "file": "src/texfit.cpp",
+      "sha256": "3c9ce6a9ffddd243a7c65ceed95c0ac0914b489925facc8d2e819eb18b41deef",
+      "origin": "project renderer/src/texfit.cpp",
+      "changes": "none"
+    },
+    {
+      "file": "src/texfit.h",
+      "sha256": "6113c83b6d636bc7203d32d274fad71a1fdbfadaaec88c2bd49496737fbe65a4",
+      "origin": "project renderer/src/texfit.h",
+      "changes": "none"
+    },
+    {
+      "file": "src/texmap.cpp",
+      "sha256": "d586d709988efcca84a463d134e031cb2f735fad9346b0623ffd7e17f19339bf",
+      "origin": "project renderer/src/texmap.cpp",
+      "changes": "none"
+    },
+    {
+      "file": "src/texmap.h",
+      "sha256": "3401cf8244cac9c085a386225a09f56b21c5352126d262f84d6a1f75013a50bc",
+      "origin": "project renderer/src/texmap.h",
+      "changes": "none"
+    },
+    {
+      "file": "src/texpack.cpp",
+      "sha256": "87b0adfcfcb62f4fca4455c79ac39142066a743d22ae42548a3aaa68dc76455d",
+      "origin": "project renderer/src/texpack.cpp",
+      "changes": "none"
+    },
+    {
+      "file": "src/texpack.h",
+      "sha256": "b62a461ba2cdc68046f4b3c0ccba5d34fa603928f082cbba1cdb524e6f792aa5",
+      "origin": "project renderer/src/texpack.h",
+      "changes": "none"
+    }
+  ],
+  "adaptations": [
+    "Narrow GxTexBinding and exact mip/hash function bodies from gxstate/texcache",
+    "mktexpack include paths",
+    "extractor imports colocated parser instead of developer home",
+    "Extractor argparse/revision validation and exclusive new output/listing paths; texture traversal/serialization unchanged",
+    "mktexpack CLI input bounds/version checks, 2 default/4 maximum workers and exclusive output; conversion policy/core unchanged"
+  ],
+  "third_party": {
+    "file": "third_party/switchwaker/disc_manifest.py",
+    "repository": "https://github.com/centollOS/SwitchWaker",
+    "commit": "108051434f2f67437947e78015b3dd409be6e1c6",
+    "path": "native/tools/disc_manifest.py",
+    "sha256": "467b06ef2483ed6ec0a0f65437151d65937a6900b0a51cbfc736251cb8889653",
+    "licence": "MIT; adjacent LICENSE preserved; unmodified upstream file"
+  }
+}

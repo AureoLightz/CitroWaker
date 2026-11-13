@@ -2,12 +2,16 @@
   "schema": 1,
   "release": "REPLACE-WITH-MATCHING-BUILD-ID",
   "cia": "game/CitroWaker.cia",
-  "extractor": "tools/extract_textures.py",
-  "disc_parser": "tools/disc_manifest.py",
-  "texture_converter": "tools/mktexpack",
   "threads": 2,
   "material_bundles": [
-    {"source": "data/ww_bundle.bin", "name": "ww_bundle.bin"},
-    {"source": "data/ww_bundle_title.bin", "name": "ww_bundle_title.bin"}
-  ]
+    {
+      "source": "data/ww_bundle.bin",
+      "name": "ww_bundle.bin"
+    },
+    {
+      "source": "data/ww_bundle_title.bin",
+      "name": "ww_bundle_title.bin"
+    }
+  ],
+  "texture_tools": "bundled"
 }

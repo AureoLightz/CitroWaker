@@ -20,12 +20,34 @@ class ExportTests(unittest.TestCase):
   self.assertTrue((out/'3ds/ww3ds/user').is_dir());self.assertTrue((out/'cia/CitroWaker.cia').is_file())
   self.assertFalse((out/'texsrc.bin').exists());self.assertFalse((out/'3ds/ww3ds/env.txt').exists())
   self.assertEqual((out/'3ds/ww3ds/GZLE01.iso').read_bytes(),(self.root/'game.iso').read_bytes())
+ def test_bundled_tools_build_and_stale_rebuild(self):
+  import os
+  tools=self.root/'tools/texture-pack';(tools/'src').mkdir(parents=True)
+  (tools/'third_party/switchwaker').mkdir(parents=True)
+  for name in ['extract_textures.py','build.py','mktexpack.cpp']:(tools/name).write_text('synthetic fixture')
+  (tools/'third_party/switchwaker/disc_manifest.py').write_text('synthetic parser')
+  source=tools/'src/fixture.cpp';source.write_text('synthetic source')
+  setup=self.root/'tools/setup';setup.mkdir()
+  self.config['texture_tools']='bundled';self.save();calls=[]
+  converter=tools/'build'/('mktexpack.exe'if os.name=='nt'else'mktexpack')
+  def invoke(args,cancel,log):
+   if len(args)==2 and args[1].endswith('build.py'):
+    calls.append('build');converter.parent.mkdir(exist_ok=True);converter.write_bytes(b'synthetic converter')
+   else:self.tools(args,cancel,log)
+  with patch.object(prepare,'__file__',str(setup/'prepare.py')),patch.object(prepare,'run_tool',side_effect=invoke):
+   for i in range(3):
+    if i==2:os.utime(source,ns=(converter.stat().st_mtime_ns+1000000,)*2)
+    prepare.prepare(self.root/'game.iso',self.manifest,self.root/('bundled'+str(i)),log=lambda s:None)
+  self.assertEqual(calls,['build','build'])
  def test_existing_output_is_untouched(self):
   out=self.root/'output';out.mkdir();(out/'save').write_text('preserve')
   with self.assertRaises(prepare.PreparationError):self.export()
   self.assertEqual((out/'save').read_text(),'preserve')
  def test_bad_iso(self):
   (self.root/'game.iso').write_bytes(bytes(0x440))
+  with self.assertRaises(prepare.PreparationError):self.export()
+ def test_other_revision_rejected(self):
+  path=self.root/'game.iso';data=bytearray(path.read_bytes());data[7]=1;path.write_bytes(data)
   with self.assertRaises(prepare.PreparationError):self.export()
  def test_unsafe_and_duplicate_names(self):
   for name in ['../escape.bin','ww_bundle/escape.bin','ww_bundle_misses.bin','ww_bundle:stream.bin','ww_bundle?.bin','ww_bundle .bin']:

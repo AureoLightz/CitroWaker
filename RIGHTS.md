@@ -1,6 +1,6 @@
 # Repository scope and rights
 
-This repository contains selected original 3DS platform components, a local setup app, console-report/showcase tools, tests and project documentation, plus one original typographic SVG and three development gameplay screenshots. It is not the complete source release or an installable release of the 3DS port. See docs/SOURCE.md for exact scope.
+This repository contains selected original 3DS platform components, a local setup app, standalone texture-conversion source, console-report/showcase tools, tests and project documentation, plus one original typographic SVG and three development gameplay screenshots. It is not the complete source release or an installable release of the 3DS port. See docs/SOURCE.md for exact scope.
 
 ## Included imagery
 
@@ -10,7 +10,7 @@ The two Outset images and ending-cutscene still are gameplay captures, included 
 
 The root [MIT licence](LICENSE) applies to project-original source, tests, tooling, documentation and the original SVG. It does not grant rights over Nintendo game imagery inside the screenshots, game assets or upstream software. Those works retain their respective rights and licensing terms. No extracted game artwork or music is included in this source batch.
 
-The port builds on zeldaret/tww, SwitchWaker, Aurora and devkitPro components. Their implementation and SDK code are not bundled in this component snapshot. Any future source/dependency publication must preserve the applicable upstream licences and notices and be reviewed separately.
+The port builds on zeldaret/tww, SwitchWaker, Aurora and devkitPro components. The texture extractor includes an unmodified SwitchWaker parser under its adjacent MIT notice. The full game and SDK implementations are not bundled in this component snapshot. Any future source/dependency publication must preserve the applicable upstream licences and notices and be reviewed separately.
 
 ## Keep local
 

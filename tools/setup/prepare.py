@@ -15,6 +15,7 @@ def validate_iso(path: Path):
     with path.open('rb') as f: header=f.read(0x440)
     if len(header)<0x440 or header[:6]!=b'GZLE01': raise PreparationError('Select the USA GameCube Wind Waker ISO (GZLE01). RVZ, WBFS and other regions are not supported.')
     if header[0x1c:0x20]!=bytes.fromhex('c2339f3d'): raise PreparationError('The input does not have a GameCube disc header.')
+    if header[7]!=0: raise PreparationError('This build requires USA revision 0 (GZLE01). Other revisions are not supported.')
     return header[7]
 
 def digest(path: Path, cancel: threading.Event, dest: Path|None=None):
@@ -66,7 +67,14 @@ def prepare(iso: Path, manifest: Path, destination: Path, cancel=None, log=print
         value=config.get(key)
         if not isinstance(value,str) or not value: raise PreparationError(f'Release manifest is missing {key}.')
         return checked(root/value)
-    cia=resource('cia');extractor=resource('extractor');parser=resource('disc_parser');converter=resource('texture_converter')
+    cia=resource('cia')
+    bundled=config.get('texture_tools')=='bundled'
+    if bundled:
+        tools=Path(__file__).resolve().parents[1]/'texture-pack'
+        extractor=checked(tools/'extract_textures.py');parser=checked(tools/'third_party/switchwaker/disc_manifest.py')
+        converter=tools/'build'/('mktexpack.exe' if os.name=='nt' else 'mktexpack')
+    else:
+        extractor=resource('extractor');parser=resource('disc_parser');converter=resource('texture_converter')
     bundles=config.get('material_bundles')
     if not isinstance(bundles,list) or not bundles: raise PreparationError('This release needs locally prepared material bundles. None were supplied.')
     inputs=[];names=set()
@@ -84,6 +92,14 @@ def prepare(iso: Path, manifest: Path, destination: Path, cancel=None, log=print
     required=iso.stat().st_size+cia.stat().st_size+sum(p.stat().st_size for p,_ in inputs)+1024**3
     if shutil.disk_usage(destination.parent).free<required: raise PreparationError('Not enough output space: allow the ISO size plus at least 1 GiB for conversion and packaging.')
     threads=max(1,min(4,int(config.get('threads',2))))
+    if bundled:
+        build_script=tools/'build.py'
+        # Rebuild when public source changes; avoid silently using a stale converter.
+        sources=list((tools/'src').glob('*'))+[tools/'mktexpack.cpp',build_script]
+        if not converter.is_file() or any(p.stat().st_mtime_ns>converter.stat().st_mtime_ns for p in sources):
+            log('Building the bundled PC texture converter (C++17 compiler required)…')
+            run_tool([sys.executable,str(build_script)],cancel,log)
+        converter=checked(converter)
     with tempfile.TemporaryDirectory(prefix='.citrowaker-',dir=destination.parent) as work:
         stage=Path(work);data=stage/'3ds/ww3ds';data.mkdir(parents=True);(stage/'cia').mkdir();(data/'user').mkdir()
         log('Checking and copying your ISO…')

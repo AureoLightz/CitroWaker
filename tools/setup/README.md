@@ -2,13 +2,17 @@
 
 Source implementation of a local Windows/Linux setup application for CitroWaker. Uses Python3.10+ and the standard library; the interface opens in your browser, with native file pickers when available. No Tk, account, external website or upload is required. No Nintendo artwork is used by the application UI.
 
-**This checkout does not include a compatible release bundle or its converter/extractor/CIA.** You can run the app and tests now; a real export requires those companion files.
+**The texture extractor/converter sources are now included.** Setup can build the converter automatically with a C++17 compiler. A compatible CIA and locally prepared material bundles are still required; the current developer CIA is not cleared for public redistribution.
+
+## With an existing local build
+
+`create_manifest.py` creates a local manifest from an existing CIA and base/title bundles, without copying them or declaring them redistributable. See [the player-install guide](../../docs/PLAYER_RELEASE.md) for the complete command and update/save precautions.
 
 ## Run
 
 Linux: `bash launch.sh`. Windows with Python3 installed: double-click `launch.cmd`. Or run `python app.py`. Keep the launcher running until export completes; Ctrl+C cancels active work. The local interface uses an ephemeral127.0.0.1 port with a random request token. Do not share its session URL. Without a native picker, paste full paths.
 
-Select your USA GameCube ISO, a compatible release.json, and a NEW export directory. Preparation copies the ISO to a temporary staging directory, extracts textures with the release's actual tool, converts/verifies them, copies the CIA/material bundles and writes INSTALL.txt +PREPARATION.json SHA256 checksums. The source ISO is unchanged. Failed/cancelled preparation removes staging; existing exports are rejected. No SD card or existing saves are edited.
+Select your USA revision-0 GameCube ISO, a compatible release.json, and a NEW export directory. Preparation copies the ISO to a temporary staging directory, extracts textures with the release's actual tool, converts/verifies them, copies the CIA/material bundles and writes INSTALL.txt +PREPARATION.json SHA256 checksums. The source ISO is unchanged. Failed/cancelled preparation removes staging; existing exports are rejected. No SD card or existing saves are edited.
 
 The finished folder contains `cia/CitroWaker.cia` and `3ds/ww3ds/{GZLE01.iso,ww_texpack.bin,ww_bundle*.bin,user/}`. Copy to your SD, preserving existing saves/configuration/misses, install the CIA separately and launch from HOME Menu. No DSP firmware is supplied.
 
@@ -22,13 +26,13 @@ The finished folder contains `cia/CitroWaker.cia` and `3ds/ww3ds/{GZLE01.iso,ww_
 
 ## Release bundle contract
 
-See release.example.json. Paths are relative to the manifest; absolute development paths also work. Use ONLY a trusted compatible release: its converter is an executable and its extractor/parser are Python code. This app does not download or authenticate a release. The creator must provide audited tools/native binaries and a compatible CIA. Windows needs a Windows `mktexpack.exe` (change the manifest path); a Linux binary cannot be reused there.
+See release.example.json. Paths are relative to the manifest; absolute development paths also work. Use ONLY a trusted compatible release: its converter is an executable and its extractor/parser are Python code. This app does not download or authenticate a release. The example uses `"texture_tools": "bundled"`, selecting the public extractor/parser and building a native converter when missing or stale. With a C++17 GCC/Clang compiler (MinGW-w64 on Windows), no developer-path tools are needed. Legacy manifests can instead name extractor/disc_parser/texture_converter paths. A Linux converter cannot be reused on Windows. The creator must still supply a compatible locally built CIA and bundles.
 
-The current extractor imports disc_manifest from a developer-specific directory. The application's isolated extraction worker explicitly loads the selected parser first, so this app does not require the user's home directory to resemble a developer checkout. No upstream extractor is modified.
+The public extractor uses its colocated MIT-licensed SwitchWaker parser. The application also preloads the selected parser for legacy manifests. No native game/compiler SDK is needed to build the PC converter.
 
 This original setup implementation is MIT-licensed under the repository root LICENSE. Companion releases retain their own rights and require a separate audit.
 
-A portable distributable still needs per-platform packaging/testing, a licensed tool-source audit, release hashes/signatures, locally generated or original CIA banner assets, and a public material-preparation workflow. Do not put the real generated texture pack, ISO, current Nintendo-art CIA or game-derived bundles into GitHub. This source folder contains only implementation/UI/documentation and a placeholder manifest.
+A portable distributable still needs per-platform packaging/testing, release hashes/signatures, an asset-clean CIA with complete corresponding source, and a public material-preparation workflow. Do not put the real generated texture pack, ISO, current Nintendo-art CIA or game-derived bundles into GitHub. This source folder contains only implementation/UI/documentation and a placeholder manifest.
 
 ## Evidence
 

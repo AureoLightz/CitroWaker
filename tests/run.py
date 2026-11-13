@@ -12,8 +12,12 @@ ROOT=Path(__file__).resolve().parents[1]
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--python-only',action='store_true',help='Skip C++ tests (requires no compiler)')
+    parser.add_argument('--texture-tools',action='store_true',help='Build and test the native PC texture converter too')
     args=parser.parse_args()
-    for folder in ['tools/setup','tools/console-report','tools/showcase']:
+    if args.texture_tools:
+        if args.python_only:parser.error('--texture-tools requires a C++17 compiler; omit --python-only')
+        subprocess.run([sys.executable,str(ROOT/'tools/texture-pack/build.py')],check=True)
+    for folder in ['tools/setup','tools/console-report','tools/showcase','tools/release','tools/texture-pack']:
         subprocess.run([sys.executable,'-m','unittest','discover','-v','-s',str(ROOT/folder)],check=True,cwd=ROOT)
     if not args.python_only:
         compiler=os.environ.get('CXX') or shutil.which('c++') or shutil.which('g++') or shutil.which('clang++')
