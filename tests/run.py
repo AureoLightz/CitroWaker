@@ -17,7 +17,7 @@ def main():
     if args.texture_tools:
         if args.python_only:parser.error('--texture-tools requires a C++17 compiler; omit --python-only')
         subprocess.run([sys.executable,str(ROOT/'tools/texture-pack/build.py')],check=True)
-    for folder in ['tools/setup','tools/console-report','tools/showcase','tools/release','tools/texture-pack']:
+    for folder in ['tools/setup','tools/console-report','tools/showcase','tools/release','tools/release/runtime-assets','tools/texture-pack']:
         subprocess.run([sys.executable,'-m','unittest','discover','-v','-s',str(ROOT/folder)],check=True,cwd=ROOT)
     if not args.python_only:
         compiler=os.environ.get('CXX') or shutil.which('c++') or shutil.which('g++') or shutil.which('clang++')

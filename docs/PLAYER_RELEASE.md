@@ -48,3 +48,9 @@ The current packaged ELF contains exact copies of extracted game-data arrays; ch
 The public artifact also needs original or locally loaded bottom-screen/HOME resources, complete corresponding-source/dependency notices for the GPL DSP HLE, and a matching material-preparation route. A texture pack is not a material bundle. These are tracked release requirements, not optional steps the installer silently skips.
 
 Until those are complete, there is no honest “download this CIA and play” link. The working tools remain usable with a compatible local build. This guide will be updated as the release gates are closed.
+
+## Current release-development progress
+
+The [inline runtime integration tool](../tools/release/runtime-assets/README.md) now validates all eleven extra payload versions, preserves unrelated edits and compiles the resulting eight affected ARM units. It requires upstream's163zero-content stubs and consistent runtime-loading build flags; it does not turn this selected-source repository into a full game build.
+
+[Original HOME generators](../tools/release/original-home/README.md) are available. A local isolated CIA was packaged with these images/chime and no boot-logo region; inspection retains124MB/804MHz settings. That packaging check does not establish real HOME Menu, save or full-game compatibility. It has not been uploaded. Current production and this frozen candidate are distinct builds.

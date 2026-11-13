@@ -21,3 +21,8 @@ Exit 1 means an exact match to known raw asset bytes was found. Exit 2 is an inv
 - Distribute a checksummed versioned release with accurate hardware compatibility, known issues and source links. Do not label the existing developer CIA ready based on a filename or an asset-scan pass.
 
 These checks concern the release artifact. The independently usable public tools/source remain available.
+
+## Integration work now available
+
+- [Runtime payload preparation](runtime-assets/README.md): version-checks and replaces eleven inline DSP/font/texture payloads in an isolated source tree; preserves unrelated edits, defaults to a read-only plan. Requires upstream163runtime stubs and a full consistent rebuild.
+- [Original HOME generators](original-home/README.md): original wind emblem, banner, icon and synthesized chime with no disc assets. The local isolated CIA packages with these resources and no boot-logo region, preserving124MB mode. No binary is distributed here; hardware HOME/save testing and matching-source preparation remain open.

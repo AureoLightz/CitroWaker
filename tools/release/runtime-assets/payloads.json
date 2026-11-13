@@ -1,0 +1,101 @@
+[
+  {
+    "id": 163,
+    "source": "game/src/JSystem/JAudio/dsptask.c",
+    "symbol": "jdsp",
+    "width": 1,
+    "bytes": 7456,
+    "sha256": "9d282f44d0de6fee1e6635978f6804a92bcfe842cb33225b739412608a35a148",
+    "row": "COS_ASSET_ROW(\"jdsp\", \"\", \"\", 0, 0x80399420, 0x1d20, COS_ASSET_RAW, \"8d28bab68bb5078c38e43f29206f0bd01f7e7a67\")"
+  },
+  {
+    "id": 164,
+    "source": "game/src/JSystem/JUtility/JUTFontData_Ascfont_fix12.cpp",
+    "symbol": "JUTResFONT_Ascfont_fix12",
+    "width": 1,
+    "bytes": 16736,
+    "sha256": "64ce655e386a6e118bb43214851ff2b344b11dd5d8b1ffcd4f436549754eca64",
+    "row": "COS_ASSET_ROW(\"JUTResFONT_Ascfont_fix12\", \"\", \"\", 0, 0x8036ca40, 0x4160, COS_ASSET_RAW, \"8d28bab68bb5078c38e43f29206f0bd01f7e7a67\")"
+  },
+  {
+    "id": 165,
+    "source": "game/src/JSystem/JUtility/JUTDirectPrint.cpp",
+    "symbol": "JUTDirectPrint::sAsciiTable",
+    "width": 1,
+    "bytes": 128,
+    "sha256": "7abf68cf6b319810389fd11894c32b1eddda8d2bc5f786c469201e7a9d63236e",
+    "row": "COS_ASSET_ROW(\"JUTDirectPrint_sAsciiTable\", \"\", \"\", 0, 0x8039d2b0, 0x80, COS_ASSET_RAW, \"8d28bab68bb5078c38e43f29206f0bd01f7e7a67\")"
+  },
+  {
+    "id": 166,
+    "source": "game/src/JSystem/JUtility/JUTDirectPrint.cpp",
+    "symbol": "JUTDirectPrint::sFontData",
+    "width": 4,
+    "bytes": 256,
+    "sha256": "3b2bef1839b861fec33bb6a788ec65429d8e09b21cdccffefd6b302150b72cb0",
+    "row": "COS_ASSET_ROW(\"JUTDirectPrint_sFontData\", \"\", \"\", 0, 0x8039d330, 0x100, COS_ASSET_F32, \"8d28bab68bb5078c38e43f29206f0bd01f7e7a67\")"
+  },
+  {
+    "id": 167,
+    "source": "game/src/JSystem/JUtility/JUTDirectPrint.cpp",
+    "symbol": "JUTDirectPrint::sFontData2",
+    "width": 4,
+    "bytes": 308,
+    "sha256": "2aafd38a1607a3440a60000c99510946b50b4e728bb5bf1b43bbcd17c8a1c2ac",
+    "row": "COS_ASSET_ROW(\"JUTDirectPrint_sFontData2\", \"\", \"\", 0, 0x8039d430, 0x134, COS_ASSET_F32, \"8d28bab68bb5078c38e43f29206f0bd01f7e7a67\")"
+  },
+  {
+    "id": 168,
+    "source": "game/src/d/actor/d_a_obj_tapestry.cpp",
+    "symbol": "l_matDL",
+    "width": 1,
+    "bytes": 52,
+    "sha256": "9cb0c11a8b91ba3312a4905d44b7a2bf3d3b148cf432f8b8e65335a8d7396353",
+    "row": "COS_ASSET_ROW(\"extra_d_a_obj_tapestry_l_matDL\", \"/rels/d_a_obj_tapestry.rel\", \"\", 5, 0x40, 0x34, COS_ASSET_RAW, \"43cc17f0e803e418a1dba775eaa2af517f3509f6\")"
+  },
+  {
+    "id": 169,
+    "source": "game/src/d/actor/d_a_obj_tapestry.cpp",
+    "symbol": "l_Txm_curtainTEX",
+    "width": 4,
+    "bytes": 8192,
+    "sha256": "00054515022e44cc5784fe453df519600acf14f59da969c5cc6e4b089f0300f9",
+    "row": "COS_ASSET_ROW(\"extra_d_a_obj_tapestry_l_Txm_curtainTEX\", \"/rels/d_a_obj_tapestry.rel\", \"\", 5, 0x80, 0x2000, COS_ASSET_F32, \"43cc17f0e803e418a1dba775eaa2af517f3509f6\")"
+  },
+  {
+    "id": 170,
+    "source": "game/src/d/actor/d_a_bgn.cpp",
+    "symbol": "l_DL",
+    "width": 1,
+    "bytes": 42,
+    "sha256": "dbe097adfe57b205d19bc91cf5581b40049b705d456bcecca2f12b63bd594d4d",
+    "row": "COS_ASSET_ROW(\"extra_d_a_bgn_l_DL\", \"/rels/d_a_bgn.rel\", \"\", 5, 0x0, 0x2a, COS_ASSET_RAW, \"15f2795d5262d293c4f91e49db7637c096a8cbbb\")"
+  },
+  {
+    "id": 171,
+    "source": "game/src/d/d_message.cpp",
+    "symbol": "dMsg2_tex_i4_color",
+    "width": 1,
+    "bytes": 240,
+    "sha256": "6f9535fe448ff0b40f7fd21d5d5d2a8fdcc76306e2b65c463eeb933390893cde",
+    "row": "COS_ASSET_ROW(\"extra_d_message_dMsg2_tex_i4_color\", \"\", \"\", 0, 0x80393160, 0xf0, COS_ASSET_RAW, \"8d28bab68bb5078c38e43f29206f0bd01f7e7a67\")"
+  },
+  {
+    "id": 172,
+    "source": "game/src/d/d_message_paper.cpp",
+    "symbol": "dMsg3_tex_i4_color",
+    "width": 1,
+    "bytes": 240,
+    "sha256": "6f9535fe448ff0b40f7fd21d5d5d2a8fdcc76306e2b65c463eeb933390893cde",
+    "row": "COS_ASSET_ROW(\"extra_d_message_paper_dMsg3_tex_i4_color\", \"\", \"\", 0, 0x803932b0, 0xf0, COS_ASSET_RAW, \"8d28bab68bb5078c38e43f29206f0bd01f7e7a67\")"
+  },
+  {
+    "id": 173,
+    "source": "game/src/JSystem/JFramework/JFWDisplay.cpp",
+    "symbol": "clear_z_TX",
+    "width": 1,
+    "bytes": 64,
+    "sha256": "55fcef9be88e2c961393e5d2a7fe01b934f5e186fc07acf464b2cba5447a1517",
+    "row": "COS_ASSET_ROW(\"extra_JFWDisplay_clear_z_TX\", \"\", \"\", 0, 0x80395be0, 0x40, COS_ASSET_RAW, \"8d28bab68bb5078c38e43f29206f0bd01f7e7a67\")"
+  }
+]
