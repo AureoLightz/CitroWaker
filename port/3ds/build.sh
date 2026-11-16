@@ -142,9 +142,81 @@ a = s.index('namespace {\naurora::Vec2<uint32_t> scale_copy_dst')
 b = s.index('} // namespace aurora::gx\n') + len('} // namespace aurora::gx\n')
 open(sys.argv[2], 'w').write(s[:a] + '// 3DS build: EFB copies are made by the renderer from the GX stream (GX_AURORA copy commands)\n' + s[b:])
 EOF
+  # (Claude, title-audio fix) Aurora's DVD worker runs reads strictly in arrival order and ignores priority, so the game's 5.6 KB
+  # streamed-music reads (JAIStreamMgr LoadADPCM) waited behind multi-MB archive loads and the DSP replayed its loop buffer (title
+  # music "broken record" on console). 3DS copy: reads of <= 64 KB go ahead of queued larger ones, and reads over 256 KB run in
+  # 256 KB pieces with waiting small reads served between pieces (the big read stays the active block for cancel/wait).
+  python3 - "$A/dolphin/dvd/dvd.cpp" gen/dvd_3ds.cpp.new <<'EOF3'
+import sys
+s = open(sys.argv[1]).read()
+def rep(old, new):
+    global s
+    assert s.count(old) == 1, old
+    s = s.replace(old, new)
+rep("""        atomic_store_release(block->state, DVD_STATE_WAITING);
+        m_queue.push_back(block);""", """        atomic_store_release(block->state, DVD_STATE_WAITING);
+        if (is_small_read(block)) {   // (3DS) ahead of queued large reads, behind earlier small ones
+          auto it = m_queue.begin();
+          while (it != m_queue.end() && is_small_read(*it)) ++it;
+          m_queue.insert(it, block);
+        } else {
+          m_queue.push_back(block);
+        }""")
+rep("""      lk.unlock();
+      process_command(block);
+      lk.lock();
+      m_activeBlock = nullptr;""", """      lk.unlock();
+      process_command_3ds(block);
+      lk.lock();
+      m_activeBlock = nullptr;""")
+rep("""  void execute(DVDCommandBlock* block) {""", """  static bool is_small_read(const DVDCommandBlock* b) { return b->command == DVD_COMMAND_READ && b->length <= (64u << 10); }
+  // (3DS) serve small reads that are waiting (worker thread, between pieces of a large read)
+  void serve_small_reads() {
+    while (true) {
+      DVDCommandBlock* small = nullptr;
+      {
+        std::lock_guard lk{m_mutex};
+        if (m_shutdown || m_queue.empty() || !is_small_read(m_queue.front())) return;
+        small = m_queue.front();
+        m_queue.pop_front();
+        atomic_store_release(small->state, DVD_STATE_BUSY);
+      }
+      process_command(small);
+      m_doneCv.notify_all();
+    }
+  }
+  void process_command_3ds(DVDCommandBlock* block) {
+    constexpr u32 kPiece = 256u << 10;
+    if (block->command != DVD_COMMAND_READ || block->length <= kPiece) { process_command(block); return; }
+    auto* handle = getCommandHandle(block);
+    u32 total = 0;
+    s32 result = 0;
+    while (total < block->length) {
+      const u32 n = std::min<u32>(kPiece, block->length - total);
+      u32 got = 0;
+      const s32 r = readFromHandle(handle, static_cast<u8*>(block->addr) + total, static_cast<s32>(n), static_cast<s32>(block->offset + total), &got);
+      if (r < 0) { result = r; break; }
+      total += got;
+      result = static_cast<s32>(total);
+      if (got < n) break;
+      if (total < block->length) serve_small_reads();
+    }
+    if (consume_active_cancel(block)) {
+      result = DVD_RESULT_CANCELED;
+      total = 0;
+    }
+    finishCommand(block, result, total);
+    if (block->callback != nullptr) {
+      block->callback(result, block);
+    }
+  }
+
+  void execute(DVDCommandBlock* block) {""")
+open(sys.argv[2], 'w').write(s)
+EOF3
   # Item B: generated 3DS SDK headers/sources; shared Aurora stays untouched.
   python3 gen_typed_gx.py "$A" gen/typed_gx
-  for f in fifo_3ds.cpp GXFrameBuffer_3ds.cpp; do cmp -s gen/$f.new gen/$f || mv gen/$f.new gen/$f; rm -f gen/$f.new; done
+  for f in fifo_3ds.cpp GXFrameBuffer_3ds.cpp dvd_3ds.cpp; do cmp -s gen/$f.new gen/$f || mv gen/$f.new gen/$f; rm -f gen/$f.new; done
 fi
 
 podman run --rm --memory=3g --memory-swap=3g --cpus=4 -e N3DS_RENDER_OPT -e N3DS_RENDER_LTO -e N3DS_PGO -e N3DS_EVENT_INDIRECT -v "$SW:/work:z" -v "$here:/arm:z" "${PUBMOUNTS[@]}" -v "$HW6:/hw6:z" localhost/ww3ds-clang bash -c '
@@ -202,9 +274,9 @@ if [ "$mode" != relink ]; then
   # ---- 2. the 3DS platform layer, game side (clang)
   base=$(grep "lib/gx/fifo.cpp" /arm/all.sh | sed "s/ -o .*//")
   A=/work/build/native-linux/_deps/aurora-src
-  extra="-I$A/lib -iquote $A/lib/gx -iquote $A/lib/dolphin/gx -I/work/build/native-linux/_deps/nod_prebuilt-src/include -I/arm/src -I/work/native/include/sdk"
+  extra="-I$A/lib -iquote $A/lib/dolphin/dvd -iquote $A/lib/gx -iquote $A/lib/dolphin/gx -I/work/build/native-linux/_deps/nod_prebuilt-src/include -I/arm/src -I/work/native/include/sdk"
   pids=""
-  for s in /arm/src/aurora_3ds.cpp /arm/src/sdl_3ds.cpp /arm/src/nod_3ds.cpp /arm/src/pad_3ds.cpp /arm/gen/fifo_3ds.cpp /arm/gen/GXFrameBuffer_3ds.cpp /arm/src/origin_prof_3ds.cpp /work/build/native-linux/_deps/fmt-src/src/format.cc; do
+  for s in /arm/src/aurora_3ds.cpp /arm/src/sdl_3ds.cpp /arm/src/nod_3ds.cpp /arm/src/pad_3ds.cpp /arm/gen/fifo_3ds.cpp /arm/gen/GXFrameBuffer_3ds.cpp /arm/gen/dvd_3ds.cpp /arm/src/origin_prof_3ds.cpp /work/build/native-linux/_deps/fmt-src/src/format.cc; do
     o=/arm/obj3ds/c_$(basename $s).o
     if [ ! -f $o ] || [ $s -nt $o ] || [ /arm/src/n3ds.h -nt $o ]; then
       ( eval "$base $extra -o $o -c $s -w" > /arm/log/c_$(basename $s).log 2>&1 || { echo "FAILED $s"; grep -m8 error /arm/log/c_$(basename $s).log; } ) &

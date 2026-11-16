@@ -51,3 +51,4 @@ native_src_pc_game_hooks_pc_capture.cpp.o
 native_src_pc_harness_pc_shot.cpp.o
 native_src_pc_runtime_pc_wwrp_capture.cpp.o
 native_check_update_tests.cpp.o
+build_native_linux__deps_aurora_src_lib_dolphin_dvd_dvd.cpp.o

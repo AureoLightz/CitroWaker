@@ -34,11 +34,11 @@ BRIEF_public_release_runtime_assets.md and ChatGPT's work/player-release/STATUS.
 
 - [ ] v128 (console, short session): draw-replay budget back to 4 MB (was pinned at 512 KB), reuse 51% -> 67%.
 - [ ] Frame rate: about 15 fps at the real CPU clock in the heavy Outset scene (ChatGPT, Nov 15); target 30.
-- [ ] Known visual bugs: grey untextured floating quad / blob on Outset (ChatGPT decoded a capture: draw ID 160 idx6 tev1, no
+- [~] (v129: real_shadows default 0 - the blobs are character-shaped grey silhouettes from the real-shadow caster pass; round shadows until that pass is fixed) Known visual bugs: grey untextured floating quad / blob on Outset (ChatGPT decoded a capture: draw ID 160 idx6 tev1, no
       texture); boat grey fragment. v128 SELECT captures: bench/console/v128/captures.bin.
-- [ ] Map UI split: on the LiveMap bottom-screen setting the map moves to the bottom screen but its frame/UI stays on the top
+- [~] (v129: frame, wind arrow and buttons hidden on top while the map is on the bottom; emulator-checked, pending console) Map UI split: on the LiveMap bottom-screen setting the map moves to the bottom screen but its frame/UI stays on the top
       screen (ChatGPT: full GCN atlas/sidebar receiver not integrated yet).
-- [ ] Title-screen audio repeats like a broken record (user, v128). NDSP output is healthy in the log (empty-checks 4,
+- [~] (v129 fix pending console: DVD reads of <= 64 KB go ahead of big loads, big reads in 256 KB pieces; gen/dvd_3ds.cpp) Title-screen audio repeats like a broken record (user, v128). NDSP output is healthy in the log (empty-checks 4,
       rejected 0, steady 32 kHz), so the repeat is upstream: suspect the game's music stream (ISO -> ARAM ring) reads falling
       behind during the heavy title scene. Next: log stream read latency (JASAramStream / DVD reads) at the title.
 - [ ] Save/load, settings menu and audio verified on console with the release build.

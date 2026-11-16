@@ -1614,6 +1614,12 @@ extern "C" int n3dsReadCopyRGBA(uint32_t addr, std::vector<uint8_t>* out, int* o
 extern "C" void GXInsertDebugMarker(const char* label);
 extern "C" int n3dsUiMapGetSourceRect(int* left, int* top, int* width, int* height) __attribute__((weak));
 static bool g_mapRouteOpen = false;   // producer thread only
+// (Claude) d_meter.cpp asks this so the minimap's frame/wind arrow/buttons are hidden on the top screen while the map itself is routed to
+// the bottom screen: the same conditions n3dsUiMapBegin routes under
+extern "C" int n3dsUiMapRoutedToBottom(void) {
+  return g_perf.uiMapBottom && g_perf.bottomUi && g_r && n3dsUiMapGetSourceRect &&
+         n3ds_ui::Presentation{n3ds_ui::presentationWord.load(std::memory_order_acquire)}.alpha();
+}
 extern "C" bool n3dsUiMapBegin(int left, int top, int width, int height) {
   if (!g_perf.uiMapBottom || !g_perf.bottomUi || !g_r || g_mapRouteOpen || !n3dsUiMapGetSourceRect) return false;
   if(!n3ds_ui::Presentation{n3ds_ui::presentationWord.load(std::memory_order_acquire)}.alpha())return false;
