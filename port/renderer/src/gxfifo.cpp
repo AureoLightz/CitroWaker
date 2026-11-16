@@ -807,7 +807,7 @@ bool GxFifo::handleDraw(uint8_t cmd, const uint8_t*& p, const uint8_t* end, int 
   for(int part=0;part<partCount;part++){
     const uint32_t n=parts[part].count;
     switch(parts[part].prim){
-      case GXP_QUADS:case GXP_QUADS2:nIdx+=size_t(n/4)*6;break;
+      case GXP_QUADS:case GXP_QUADS2:nIdx+=n==3?3:size_t(n/4)*6;break;   // (Claude) a 3-vertex quad draws one triangle on GX hardware (Wind Waker's stars; Dolphin does the same)
       case GXP_TRIANGLES:nIdx+=size_t(n/3)*3;break;
       case GXP_TRISTRIP:case GXP_TRIFAN:nIdx+=n>2?size_t(n-2)*3:0;break;
       default:break;
@@ -818,6 +818,7 @@ bool GxFifo::handleDraw(uint8_t cmd, const uint8_t*& p, const uint8_t* end, int 
     const uint32_t n=parts[part].count;
     switch(parts[part].prim){
       case GXP_QUADS:case GXP_QUADS2:
+        if(n==3){ti[0]=b;ti[1]=b+1;ti[2]=b+2;ti+=3;break;}
         for(uint32_t v=0;v+3<n;v+=4){const uint32_t q=b+v;ti[0]=q;ti[1]=q+1;ti[2]=q+2;ti[3]=q+2;ti[4]=q+3;ti[5]=q;ti+=6;}break;
       case GXP_TRIANGLES:
         for(uint32_t v=0;v+2<n;v+=3){ti[0]=b+v;ti[1]=b+v+1;ti[2]=b+v+2;ti+=3;}break;
