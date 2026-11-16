@@ -71,6 +71,7 @@ struct Backend3ds::GpuTex {  // what TexEntry::user points at
   // the "lines" and broken clouds/blur). `src`'s colour buffer is repacked into `stage` (power-of-two VRAM) before each read.
   C3D_RenderTarget* src = nullptr;
   void* stage = nullptr;
+  uint32_t vramBytes = 0;    // (Claude v133) VRAM held by a rendered texture (allocRendered*), for the [copy] report
 };
 namespace {
 uint64_t g_texGen = 0;
@@ -99,6 +100,7 @@ bool Backend3ds::init(size_t arenaBytes) {
 
 void Backend3ds::freeGpuTex(GpuTex* g) {
   if (!g) return;
+  if (g->vramBytes) { st_.rtLive--; st_.rtVramBytes -= g->vramBytes; }
   if (g->rt) C3D_RenderTargetDelete(g->rt);
   for (int l = 1; l < 8; l++) if (g->rtLevel[l]) C3D_RenderTargetDelete(g->rtLevel[l]);
   if (!g->view) C3D_TexDelete(&g->tex);
@@ -330,6 +332,7 @@ bool Backend3ds::allocRendered(TexEntry& e) {
   g->rt = C3D_RenderTargetCreateFromTex(&g->tex, GPU_TEXFACE_2D, 0, -1);
   if (!g->rt) { C3D_TexDelete(&g->tex); delete g; return fail("C3D_RenderTargetCreateFromTex failed"); }
   g->gen = ++g_texGen;
+  g->vramBytes = g->tex.size; st_.rtLive++; st_.rtVramBytes += g->vramBytes;
   e.user = reinterpret_cast<uintptr_t>(g);
   st_.texturesUploaded++;
   st_.textureBytes += size_t(m.width) * m.height * (m.fmt == PTF_RGBA8 ? 4 : m.fmt == PTF_RGB8 ? 3 : 2);
@@ -358,6 +361,7 @@ bool Backend3ds::allocRenderedMips(TexEntry& e, int levels) {
   P.width = u16(m.width); P.height = u16(m.height); P.maxLevel = u8(levels - 1); P.format = GPU_TEXCOLOR(m.fmt); P.type = GPU_TEX_2D; P.onVram = true;
   if (!C3D_TexInitWithParams(&g->tex, nullptr, P)) { delete g; return fail("C3D_TexInitWithParams failed (mipmapped rendered texture: VRAM full?)"); }   // render targets live in VRAM
   g->levels = levels;
+  g->vramBytes = g->tex.size; st_.rtLive++; st_.rtVramBytes += g->vramBytes;
   for (int l = 0; l < levels; l++) {
     g->rtLevel[l] = C3D_RenderTargetCreateFromTex(&g->tex, GPU_TEXFACE_2D, l, -1);
     if (!g->rtLevel[l]) { for (int k = 0; k < l; k++) C3D_RenderTargetDelete(g->rtLevel[k]); C3D_TexDelete(&g->tex); delete g; return fail("C3D_RenderTargetCreateFromTex failed (level)"); }

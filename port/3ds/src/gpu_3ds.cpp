@@ -684,7 +684,8 @@ int n3dsGpuInitLocal(void) {
   t2p::g_compactPoseStorage=g_perf.compactPoseStorage;n3dsLog("[model] compact_pose %d\n",int(g_perf.compactPoseStorage));
   if (g_perf.texturePack) {   // (Claude v92) offline texture pack
     const bool verify = std::getenv("N3DS_TEXPACK_VERIFY") != nullptr;
-    const bool ok = g_r->loadTexturePack(g_perf.textureShards?N3DS_ROOT "/ww_texpack":N3DS_ROOT "/ww_texpack.bin", verify, g_perf.textureShards);
+    bool ok = g_r->loadTexturePack(g_perf.textureShards?N3DS_ROOT "/ww_texpack":N3DS_ROOT "/ww_texpack.bin", verify, g_perf.textureShards);
+    if (!ok && g_perf.textureShards) { ok = g_r->loadTexturePack(N3DS_ROOT "/ww_texpack.bin", verify, false); if (ok) { g_perf.textureShards = false; n3dsLog("[texpack] no split pack: using ww_texpack.bin\n"); } }   // (Claude v133) players' setup exports the single file
     n3dsLog("[texstore] split %d page 8 KB\n",int(g_perf.textureShards));
     n3dsLog("[texpack] %s: %lu entries%s\n", ok ? "loaded" : "not loaded (missing or built with other options): textures are converted here", (unsigned long)g_r->texturePackEntries(), verify ? ", VERIFY (every hit is converted too)" : "");
   } else n3dsLog("[texpack] off (texture_pack=0)\n");
@@ -954,9 +955,9 @@ void n3dsGpuEndFrameLocal(void) {
   if(g_perf.rigidClip && g_frames%60==0)n3dsLog("[clip] frame %lu tests %u rejected %u\n",(unsigned long)g_frames.load(),F.clipTests,F.clipCulled);
   if (g_frames % 600 == 0) {   // (Claude v92) texture pack effect: misses served from the pack vs converted here, and the time each took
     const t2p::TexCacheStats ts = g_r->cache().stats(); const double k = 1000.0 / SYSCLOCK_ARM11;
-    n3dsLog("[texpack] frame %lu: pack hits %llu (read %.0f ms, %.1f MB), converted %llu (%.0f ms), read failures %llu, verified %llu bad %llu\n", (unsigned long)g_frames.load(),
+    n3dsLog("[texpack] frame %lu: pack hits %llu (read %.0f ms, %.1f MB), converted %llu (%.0f ms), read failures %llu, verified %llu bad %llu%s\n", (unsigned long)g_frames.load(),
             (unsigned long long)ts.packHits, ts.packReadTicks * k, double(ts.packReadBytes) / 1e6, (unsigned long long)(ts.misses - ts.packHits), ts.convTicks * k, (unsigned long long)ts.packReadFail,
-            (unsigned long long)ts.packVerified, (unsigned long long)ts.packVerifyBad);
+            (unsigned long long)ts.packVerified, (unsigned long long)ts.packVerifyBad, ts.packSwitchedOff ? "; pack SWITCHED OFF (slower than converting)" : "");
     n3dsLog("[texpack-cost] cumulative: SD seek/read %.1f ms, output allocation %.1f ms\n", ts.packIoTicks * k, ts.packAllocTicks * k);
   }
   { static const bool texProf = [] { const char* v = std::getenv("N3DS_PROF_TEX"); return v && v[0] == '1'; }();
@@ -991,7 +992,7 @@ void n3dsGpuEndFrameLocal(void) {
       n3dsLog("[replay] budget %u KB (entries %u KB, heap free %u KB)\n", unsigned(want >> 10), unsigned(used >> 10), unsigned(freeB >> 10));
     }
     n3dsBigAllocReport();
-    if (g_r && g_r->backend().stats().copyAllocFails) n3dsLog("[copy] rendered-texture allocations failed so far: %u (copy lost, clear kept); VRAM free %u KB, render-target pool %u\n", unsigned(g_r->backend().stats().copyAllocFails), unsigned(vramSpaceFree() / 1024), unsigned(g_r->backend().rtPoolSize()));   // (Claude, shadow fix)
+    if (g_r) n3dsLog("[copy] rendered-texture allocations failed so far: %u (copy lost, clear kept); VRAM free %u KB, render-target pool %u, rendered textures %u holding %u KB VRAM\n", unsigned(g_r->backend().stats().copyAllocFails), unsigned(vramSpaceFree() / 1024), unsigned(g_r->backend().rtPoolSize()), unsigned(g_r->backend().stats().rtLive), unsigned(g_r->backend().stats().rtVramBytes / 1024));   // (Claude, shadow fix)
     n3dsLog("[fifo] drain stalls %u\n", n3dsFifoDrainStalls);
   }
   if (frameLogged && g_frameLogCount < kFrameLogMax) {

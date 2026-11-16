@@ -13,7 +13,8 @@ python3 -I "$ORIG/generate.py" --output "$P/home" --font "${HOME_FONT:-/usr/shar
 audio=$here/presentation/home_audio/citrowaker-highlight.wav
 [ -s "$audio" ] || python3 -I "$here/presentation/home_audio/generate.py" >/dev/null   # synthesized; not stored in git
 cp "$P/ww3ds.elf" "$P/ww3ds.snapshot.elf"
-grep -v '^ *Logo *:' "$here/cia/ww3ds.rsf" > "$P/ww3ds-public.rsf"
+# (Claude v133) own title (UniqueId 0xff2d8, product code CTR-P-CTWK): installs beside the developer build instead of replacing it
+grep -v '^ *Logo *:' "$here/cia/ww3ds.rsf" | sed -E 's/^( *UniqueId *: *).*/\10xff2d8/; s/^( *ProductCode *: *).*/\1CTR-P-CTWK/; s/^( *Title *: *).*/\1CitroWaker/' > "$P/ww3ds-public.rsf"
 cd "$P"
 "$T/bannertool" makebanner -i home/banner.png -a "$audio" -o banner.bnr
 "$T/bannertool" makesmdh -s 'CitroWaker' -l 'CitroWaker' -p 'CitroWaker contributors' -i home/icon-48.png -o icon.smdh

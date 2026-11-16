@@ -100,7 +100,7 @@ struct TexCacheStats {
   uint64_t staleSample = 0, staleVerify = 0, invalidated = 0, evicted = 0;
   uint64_t retiredHits = 0;   // (Claude v105) misses answered by a retired entry (TextureCache::retire)
   uint64_t hintHits = 0, hintMisses = 0;   // (Claude v102) lookups answered by the producer's hash / hinted but not cached
-  uint64_t packHits = 0, packMisses = 0, packReadFail = 0, packVerified = 0, packVerifyBad = 0, packReadTicks = 0, convTicks = 0, packReadBytes = 0;
+  uint64_t packHits = 0, packMisses = 0, packReadFail = 0, packVerified = 0, packVerifyBad = 0, packReadTicks = 0, convTicks = 0, packReadBytes = 0, packSwitchedOff = 0;
   uint64_t packAllocTicks = 0, packIoTicks = 0; // Split SD reads from GPU/output allocation; packReadTicks includes both.   // (Claude) offline texture pack (texpack.h)
   size_t entries = 0, bytes = 0;
 };
@@ -211,6 +211,7 @@ class TextureCache {
   PaletteMemo paletteMemo_[16];
   TexCacheOptions opt_;
   const TexPackReader* pack_ = nullptr;
+  bool packOff_ = false;   // (Claude v133) pack slower than conversion: off for the session
   bool packVerify_ = false;
   bool loadFromPack(const GxTexBinding& b, const TexPackRecord& r, TexEntry& e);
   TlutMemory tlut_;

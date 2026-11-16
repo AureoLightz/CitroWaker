@@ -66,8 +66,8 @@ struct Performance3ds {
   int foliageFar=3000; // (Claude v100, default 3000 per user 2026-11-13 "whatever increases framerate the most"): grass/flower/tree culling distance limit in game units; 0 = original distance
   bool j3dGeometry=true; // (Claude v97: default on) J3D shapes sent by reference (v95); output identical in the emulator.
   bool j3dPrograms=false; // J3D material command programs, exact, experimental.
-  bool textureShards=false; // Experimental PC split pack, bounded8KiB read cache.
-  bool texturePack=false;  // (Claude v92) textures converted on the PC ahead of time (N3DS_ROOT/ww_texpack.bin, texpack/mktexpack): cache misses read them instead of converting; exact
+  bool textureShards=true;  // (Claude v133: default on; falls back to ww_texpack.bin; the pack turns itself off when slower than converting) // Experimental PC split pack, bounded8KiB read cache.
+  bool texturePack=true;   // (Claude v133: default on, self-checking - texcache.cpp packOff_)  // (Claude v92) textures converted on the PC ahead of time (N3DS_ROOT/ww_texpack.bin, texpack/mktexpack): cache misses read them instead of converting; exact
   bool residentGeometry=true;  // (Claude v86, default on: exact, fixture 40.0 -> 38.1 ms, soak clean; 0 = pack every frame) translate-once, step 2: packed buffers of retained geometry stay in linear memory across frames (no packing, no arena copy), exact
   bool drawReplay=true;        // (Claude v117) direct path step 1: unchanged draws of the previous frame are submitted from their finished plan (renderer3ds.h ReplayEntry)
   int replayKb=4096;           // (Claude v117; v119 3072 -> 4096: recorded entries are larger) its heap budget at most (entries ~4-5 KB); gpu_3ds.cpp lowers it to keep 7 MiB of the heap free

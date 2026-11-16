@@ -336,7 +336,20 @@ TexLookup TextureCache::getImpl(const GxTexBinding& b, const GuestMem& mem, cons
   st_.misses++;
   std::unique_ptr<TexEntry> e(new TexEntry());
   bool fromPack = false;
-  if (pack_) {   // (Claude) converted on the PC ahead of time (texpack.h): identical bytes, no conversion
+  // (Claude v133) the pack must pay for itself: after 48 reads its mean read time is compared with the mean conversion time (5 ms
+  // a texture measured on console when nothing was converted yet). A slower pack is switched off for the rest of the session; the
+  // textures are then converted as before. (Console v125: one 289 MB file took ~81 ms a read.)
+  if (pack_ && !packOff_ && st_.packHits >= 48) {
+    const uint64_t convN = st_.conversions - st_.packHits;
+#ifdef __3DS__
+    const uint64_t fiveMs = 268111ull * 5;   // system ticks
+#else
+    const uint64_t fiveMs = 5000000ull;      // ns
+#endif
+    const uint64_t convMean = convN >= 16 ? st_.convTicks / convN : fiveMs;
+    if (st_.packReadTicks / st_.packHits > convMean) { packOff_ = true; st_.packSwitchedOff = 1; }
+  }
+  if (pack_ && !packOff_) {   // (Claude) converted on the PC ahead of time (texpack.h): identical bytes, no conversion
     TexPackKey pk; size_t avail = 0;
     const uint8_t* raw = palEntries ? tlut_.rawAt(b.tlutOffset, avail) : nullptr;
     TexPackRecord r;
