@@ -64,6 +64,7 @@ class Backend3ds {
   void beginFrame();                         // right after C3D_FrameBegin
   // outside a frame (before C3D_FrameBegin): deletes pooled render textures beyond `keep`. citro3d panics (svcBreak) when a render
   // target is deleted inside a frame, so expired rendered copies go to a pool that allocRendered reuses, and only this trims it
+  size_t rtPoolSize() const { return rtPool_.size(); }
   void trimRenderPool(size_t keep = 12);
   void beginTarget(C3D_RenderTarget* t);     // C3D_FrameDrawOn and cache reset
 

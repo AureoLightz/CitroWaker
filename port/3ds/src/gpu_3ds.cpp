@@ -991,7 +991,7 @@ void n3dsGpuEndFrameLocal(void) {
       n3dsLog("[replay] budget %u KB (entries %u KB, heap free %u KB)\n", unsigned(want >> 10), unsigned(used >> 10), unsigned(freeB >> 10));
     }
     n3dsBigAllocReport();
-    if (g_r && g_r->backend().stats().copyAllocFails) n3dsLog("[copy] rendered-texture allocations failed so far: %u (copy lost, clear kept)\n", unsigned(g_r->backend().stats().copyAllocFails));   // (Claude, shadow fix)
+    if (g_r && g_r->backend().stats().copyAllocFails) n3dsLog("[copy] rendered-texture allocations failed so far: %u (copy lost, clear kept); VRAM free %u KB, render-target pool %u\n", unsigned(g_r->backend().stats().copyAllocFails), unsigned(vramSpaceFree() / 1024), unsigned(g_r->backend().rtPoolSize()));   // (Claude, shadow fix)
     n3dsLog("[fifo] drain stalls %u\n", n3dsFifoDrainStalls);
   }
   if (frameLogged && g_frameLogCount < kFrameLogMax) {

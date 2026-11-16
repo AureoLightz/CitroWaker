@@ -326,7 +326,7 @@ bool Backend3ds::allocRendered(TexEntry& e) {
   GpuTex* g = new (std::nothrow) GpuTex();
   if (!g) return fail("out of memory (rendered texture handle)");
   std::memset(&g->tex, 0, sizeof(g->tex));
-  if (!C3D_TexInitVRAM(&g->tex, u16(m.width), u16(m.height), GPU_TEXCOLOR(m.fmt))) { delete g; return fail("C3D_TexInitVRAM failed (VRAM exhausted?)"); }
+  if (!C3D_TexInitVRAM(&g->tex, u16(m.width), u16(m.height), GPU_TEXCOLOR(m.fmt))) { delete g; return fail("C3D_TexInitVRAM failed (VRAM exhausted?)"); }   // render targets must be in VRAM (citro3d)
   g->rt = C3D_RenderTargetCreateFromTex(&g->tex, GPU_TEXFACE_2D, 0, -1);
   if (!g->rt) { C3D_TexDelete(&g->tex); delete g; return fail("C3D_RenderTargetCreateFromTex failed"); }
   g->gen = ++g_texGen;
