@@ -1,0 +1,19 @@
+# Allowlist: renderer source and tools only. Captures, texture packs, generated test data and builds are never tracked.
+/*
+!/.gitignore
+!/src/
+!/src3ds/
+!/texpack/
+!/*.cpp
+!/*.h
+!/build_benchreplay.sh
+/hwcheck6_data.h
+/texpack/*
+!/texpack/*.cpp
+!/texpack/*.py
+*.pre*
+*.preaurora
+*.orig
+*.bak
+__pycache__/
+*.o

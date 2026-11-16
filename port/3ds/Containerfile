@@ -1,0 +1,2 @@
+FROM localhost/centollos-linux-build:2a997a5afebb
+COPY --from=docker.io/devkitpro/devkitarm /opt/devkitpro /opt/devkitpro
