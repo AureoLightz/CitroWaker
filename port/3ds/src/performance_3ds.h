@@ -96,7 +96,7 @@ struct Performance3ds {
   bool snapshotSkip=true; // (Claude v102) textures the renderer's cache already holds are hashed, not copied, at frame end
   bool snapshotCopies=true; // (Claude v116) EFB copy destinations (GPU textures) are not copied at frame end
   bool earlyRelease=true;   // (Claude v115) early_release: the game thread resumes once the frame is decoded + snapshotted (not after the render hand-off)
-  bool realShadows=false;  // (Claude v129: default off - the real-shadow caster pass left grey character silhouettes on screen on console, e.g. Outset; the game's round shadow is used. real_shadows=1 to compare) (Claude v114) real_shadows=0: model-shaped (rendered) shadows replaced by the round simple shadow
+  bool realShadows=true;   // (Claude v130: back on - the grey silhouettes were shadow copies whose clear was skipped when VRAM for the copy texture ran out; backend3ds copy now always clears) (Claude v114) real_shadows=0: round simple shadows
   bool skipDraw=true;   // (Claude v114) skip_draw: frames that will not be painted (frame_skip) do not run the actor draw pass either; skip_draw=0 = always run it
   int frameSkip=1;   // (Claude v113: default 1 again: the user wants game speed independent of paint rate; v104-v112 default 0) game logic keeps 30 Hz: up to N frames in a row are not painted while the game runs behind real time (0 = off)
   bool rigidClip=false; // Experimental guarded clip rejection for rigid retained triangles.

@@ -75,8 +75,10 @@ def prepare(iso: Path, manifest: Path, destination: Path, cancel=None, log=print
         converter=tools/'build'/('mktexpack.exe' if os.name=='nt' else 'mktexpack')
     else:
         extractor=resource('extractor');parser=resource('disc_parser');converter=resource('texture_converter')
-    bundles=config.get('material_bundles')
-    if not isinstance(bundles,list) or not bundles: raise PreparationError('This release needs locally prepared material bundles. None were supplied.')
+    # Material bundles are optional: without them the game builds each material the first time it is seen (a short stutter on the
+    # first visit to an area) and keeps the results in ww_bundle_misses.bin for later sessions.
+    bundles=config.get('material_bundles',[])
+    if not isinstance(bundles,list): raise PreparationError('material_bundles must be a list.')
     inputs=[];names=set()
     for entry in bundles:
         src=checked(root/entry['source']);name=entry['name']

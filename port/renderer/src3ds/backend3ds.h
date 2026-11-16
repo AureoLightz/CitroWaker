@@ -43,7 +43,7 @@ class Backend3ds {
   using Log = std::function<void(const std::string&)>;
 
   struct Stats {
-    uint32_t draws = 0, refused = 0, noArena = 0, noCmdBuf = 0, splits = 0, kicks = 0;
+    uint32_t draws = 0, copyAllocFails = 0, refused = 0, noArena = 0, noCmdBuf = 0, splits = 0, kicks = 0;
     uint32_t shadersLoaded = 0, texturesUploaded = 0;
     uint64_t textureBytes = 0, arenaPeak = 0;
     uint32_t stateSkips = 0;          // attribute / texenv / effect groups not re-sent because their hash matched

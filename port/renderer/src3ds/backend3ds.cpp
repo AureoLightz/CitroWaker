@@ -448,9 +448,14 @@ bool Backend3ds::copy(EfbCopyPlan& P, TextureCache& cache, C3D_RenderTarget* mai
   if (P.toTexture) {
     TexEntry* e = cache.addRendered(P.tex);
     if (!e || !allocRendered(*e)) {
+      // (Claude, shadow fix) no memory for the copy's texture: the copy is lost, but its clear must still run. Returning here left the
+      // real-shadow casters' silhouettes (and their depth) in the frame, so the scene could not draw over them: grey character
+      // silhouettes on console, where linear memory is tight.
       cache.invalidateRange(P.tex.addr, P.tex.guestBytes);
-      return false;
-    }
+      err_ = "copy: no memory for the rendered texture";
+      st_.copyAllocFails++;
+      done = false;
+    } else {
     GpuTex* g = reinterpret_cast<GpuTex*>(e->user);
     refreshViews(P.blit);
     C3D_FrameDrawOn(g->rt);
@@ -465,6 +470,7 @@ bool Backend3ds::copy(EfbCopyPlan& P, TextureCache& cache, C3D_RenderTarget* mai
       done = false;
     } else {
       st_.copies++;
+    }
     }
   }
   if (P.clears) {

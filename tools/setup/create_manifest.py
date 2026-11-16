@@ -19,12 +19,11 @@ def create(cia,bundles,output,release='local build'):
             raise prepare.PreparationError('Choose base/title material bundles named ww_bundle*.bin; do not distribute the growing misses file.')
         if name.casefold()in names:raise prepare.PreparationError('Duplicate bundle filename.')
         names.add(name.casefold());entries.append({'source':str(src),'name':name})
-    if not entries:raise prepare.PreparationError('At least one locally prepared material bundle is required.')
     output.parent.mkdir(parents=True,exist_ok=True)
     data={'schema':1,'release':release,'cia':str(cia),'texture_tools':'bundled','threads':2,'material_bundles':entries}
     with output.open('x',encoding='utf-8')as f:json.dump(data,f,indent=2);f.write('\n')
     return output
 if __name__=='__main__':
-    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--cia',required=True,type=Path);p.add_argument('--bundle',required=True,action='append',type=Path);p.add_argument('--output',required=True,type=Path);p.add_argument('--label',default='local build');a=p.parse_args()
+    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--cia',required=True,type=Path);p.add_argument('--bundle',action='append',default=[],type=Path);p.add_argument('--output',required=True,type=Path);p.add_argument('--label',default='local build');a=p.parse_args()
     try:print(create(a.cia,a.bundle,a.output,a.label))
     except (prepare.PreparationError,OSError)as e:p.exit(1,str(e)+'\n')

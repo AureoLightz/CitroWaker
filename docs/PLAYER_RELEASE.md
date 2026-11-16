@@ -4,15 +4,19 @@ The PC texture-preparation path now works from this repository. A public game CI
 
 ## Working now, for an existing compatible local build
 
-Requirements: Python 3.10+, a C++17 GCC/Clang compiler (MinGW-w64 on Windows), your USA GameCube revision-0 ISO, a locally built compatible CIA and locally prepared base/title material bundles.
+Requirements: Python 3.10+, a C++17 GCC/Clang compiler (MinGW-w64 on Windows), your USA GameCube revision-0 ISO, and a locally built compatible CIA. Material bundles are optional: without them the game builds each material the first time it appears (a short stutter on the first visit to an area, measured in the emulator) and keeps the results in `ww_bundle_misses.bin` for later sessions.
 
 1. Clone/download this repository.
 2. Create a **private local manifest**, using your existing compatible files:
 
    ```sh
    python3 tools/setup/create_manifest.py --cia /private/CitroWaker.cia \
-     --bundle /private/ww_bundle.bin --bundle /private/ww_bundle_title.bin \
      --output /private/release.json
+   ```
+
+   (Optionally add `--bundle /private/ww_bundle.bin` for each prepared material bundle you have.)
+
+   ```text
    ```
 
 3. Start `python3 tools/setup/app.py`. Select your ISO, that manifest and a new export folder. The bundled converter is built on first use or when its source is newer than the binary.
