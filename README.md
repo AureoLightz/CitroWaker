@@ -17,6 +17,7 @@
 > **In development.** Gameplay runs on real New 3DS hardware. Rendering, performance and stability work continues; full-game completion is unverified. Selected source components and tools are now available below; there is no downloadable game build yet.
 
 ## The project
+*AI DISCLAIMER* Codex and Claude Code were used for a solid chunk of this, as a college student i literally do not have the time to do it all alone.
 
 CitroWaker brings Wind Waker's native game code to the **New Nintendo 3DS, New 3DS XL and New 2DS XL**. Built on the community decompilation, SwitchWaker and Aurora, it translates the game's GameCube graphics commands for the handheld's PICA GPU.
 
