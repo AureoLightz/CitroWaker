@@ -16,9 +16,6 @@ Requirements: Python 3.10+, a C++17 GCC/Clang compiler (MinGW-w64 on Windows), y
 
    (Optionally add `--bundle /private/ww_bundle.bin` for each prepared material bundle you have.)
 
-   ```text
-   ```
-
 3. Start `python3 tools/setup/app.py`. Select your ISO, that manifest and a new export folder. The bundled converter is built on first use or when its source is newer than the binary.
 4. Wait for conversion and verification. The completed folder contains:
 
