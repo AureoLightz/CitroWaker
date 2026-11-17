@@ -891,14 +891,23 @@ void n3dsGpuEndFrameLocal(void) {
   // (Claude v77) built-in A/B (auto_ab): both configurations give the same pixels; alternate them in 120-frame blocks so one play session measures both
   const int abSide=g_perf.autoAb?int((logFrame/120)&1):-1;
   // (Claude v83) the A/B switches nothing (see finishRecording); both blocks are logged
-  // (Claude v139) env N3DS_AB_KNOBS=1: console A/B of exact runtime options in one session, 300-frame phases cycling
-  // 0 = defaults, 1 = fast-alloc borrowing off, 2 = pack_vertex_major on, 3 = decode_overwrite on; "[ab-knobs]" lines
+  // (Claude v140) env N3DS_AB_KNOBS=1: console A/B of exact runtime options in one session. Phases of kKnobPhase frames alternate the
+  // defaults with one candidate at a time (D c1 D c2 D c3 ...); each candidate is compared with the defaults phase right before it, so the
+  // scene changes that happen over a session mostly cancel. "[ab-knobs]" lines: phase switches and, every full cycle, the paired totals.
+  constexpr int kKnobs = 8; constexpr uint32_t kKnobPhase = 120;
   static const bool knobAb = std::getenv("N3DS_AB_KNOBS") != nullptr;
-  const int knob = knobAb ? int((logFrame / 300) % 4) : -1;
-  static const char* const kKnobNames[4] = {"defaults", "borrow off", "pack_vertex_major", "decode_overwrite"};
+  const uint32_t knobPhaseNo = logFrame / kKnobPhase;
+  const int knob = !knobAb ? -1 : (knobPhaseNo & 1) ? int((knobPhaseNo / 2) % (kKnobs - 1)) + 1 : 0;
+  static const char* const kKnobNames[kKnobs] = {"defaults", "borrow off", "pack_vertex_major", "decode_overwrite", "shared_materials",
+                                                 "uniform_delta", "state_cp_incremental", "compact_pose"};
   if (knob >= 0) { static int cur = -1;
     if (knob != cur) { cur = knob; n3dsFastAllocBorrow(knob != 1); t2p::g_packVertexMajor = knob == 2 || g_perf.packVertexMajor;
-      t2p::g_decodedInitMode = (knob == 3 || g_perf.decodeOverwrite) ? 1 : 0; n3dsLog("[ab-knobs] frame %lu: config %d (%s)\n", (unsigned long)logFrame, knob, kKnobNames[knob]); } }
+      t2p::g_decodedInitMode = (knob == 3 || g_perf.decodeOverwrite) ? 1 : 0;
+      t2p::g_sharedMaterialVectors = knob == 4 || g_perf.sharedMaterials;
+      g_r->setUniformDelta(knob == 5 || g_perf.uniformDelta);
+      t2p::g_stateCpIncremental = knob == 6 || g_perf.stateCpIncremental;
+      t2p::g_compactPoseStorage = knob == 7 || g_perf.compactPoseStorage;
+      n3dsLog("[ab-knobs] frame %lu: config %d (%s)\n", (unsigned long)logFrame, knob, kKnobNames[knob]); } }
   if (g_r3dsTrace) g_r3dsTrace("end-frame: before renderFrame", 0);
   {   // (Claude v97) N3DS_AB_CYCLE: draw reuse switched here, on the render owner, between frames
     static int cur = -1; const int want = g_abDrawReuse.load();
@@ -927,11 +936,27 @@ void n3dsGpuEndFrameLocal(void) {
         n3dsLog("[ab] frame %lu side %d (%s): %u frames render %.2f present %.2f (%.2f fps) process %.2f ms; %u timed: build %.2f plan %.2f draw %.2f ms\n",(unsigned long)logFrame,s,s?"block B":"block A",abFrames[s],abRender[s]/n,abPresent[s]/n,abPresent[s]>0?1000.0*n/abPresent[s]:0.0,abProcess[s]/n,abTimed[s],abBuild[s]/m,abPlan[s]/m,abDraw[s]/m);}
     }
   }
-  if (knob >= 0) {   // (Claude v139) per configuration: gameplay frames (100+ draws), the first 15 of each phase skipped
-    static double kP[4], kR[4], kQ[4]; static uint32_t kN[4];
-    if (F.draws >= 100 && logFrame % 300 >= 15 && presentMs > 0) { kP[knob] += presentMs; kR[knob] += renderMs; kQ[knob] += processMs; ++kN[knob]; }
-    if (logFrame % 1200 == 0) for (int s = 0; s < 4; s++) { const double n = kN[s] ? kN[s] : 1;
-      n3dsLog("[ab-knobs] frame %lu config %d (%s): %u frames present %.2f ms (%.2f fps) render %.2f process %.2f ms\n", (unsigned long)logFrame, s, kKnobNames[s], kN[s], kP[s] / n, kP[s] > 0 ? 1000.0 * n / kP[s] : 0.0, kR[s] / n, kQ[s] / n); }
+  if (knob >= 0) {   // (Claude v140) paired: gameplay frames (100+ draws) of each phase, the first 10 skipped; a candidate phase counts only
+    // with the defaults phase just before it, and both sides are summed per candidate
+    struct Acc { double p = 0, r = 0, q = 0; uint32_t n = 0; };
+    static Acc cur, prevDefaults; static uint32_t curPhase = ~0u; static int curKnob = -1;
+    static Acc candSide[kKnobs], baseSide[kKnobs]; static uint32_t pairs[kKnobs];
+    if (knobPhaseNo != curPhase) {
+      if (curKnob == 0) prevDefaults = cur;
+      else if (curKnob > 0 && cur.n >= 20 && prevDefaults.n >= 20) {
+        Acc& c = candSide[curKnob]; Acc& d = baseSide[curKnob];
+        c.p += cur.p / cur.n; c.r += cur.r / cur.n; c.q += cur.q / cur.n; c.n += cur.n;
+        d.p += prevDefaults.p / prevDefaults.n; d.r += prevDefaults.r / prevDefaults.n; d.q += prevDefaults.q / prevDefaults.n; d.n += prevDefaults.n;
+        ++pairs[curKnob];
+      }
+      if (curKnob > 0) prevDefaults = Acc{};
+      cur = Acc{}; curPhase = knobPhaseNo; curKnob = knob;
+    }
+    if (F.draws >= 100 && logFrame % kKnobPhase >= 10 && presentMs > 0) { cur.p += presentMs; cur.r += renderMs; cur.q += processMs; ++cur.n; }
+    if (logFrame % (kKnobPhase * 2 * (kKnobs - 1)) == 0) for (int k = 1; k < kKnobs; k++) { if (!pairs[k]) continue; const double m = pairs[k];
+      n3dsLog("[ab-knobs] frame %lu %s vs defaults, %u pairs (%u/%u frames): present %.2f/%.2f ms (%+.1f%%) render %.2f/%.2f process %.2f/%.2f ms\n",
+        (unsigned long)logFrame, kKnobNames[k], pairs[k], candSide[k].n, baseSide[k].n, candSide[k].p / m, baseSide[k].p / m,
+        baseSide[k].p > 0 ? 100.0 * (candSide[k].p - baseSide[k].p) / baseSide[k].p : 0.0, candSide[k].r / m, baseSide[k].r / m, candSide[k].q / m, baseSide[k].q / m); }
   }
   if(presentMs>0){g_presentSum+=presentMs;++g_presentCount;g_presentMin=std::min(g_presentMin,presentMs);g_presentMax=std::max(g_presentMax,presentMs);}
   g_mem.frozen=false;
