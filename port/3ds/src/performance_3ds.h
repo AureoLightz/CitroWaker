@@ -101,7 +101,7 @@ struct Performance3ds {
   bool skipDraw=true;   // (Claude v114) skip_draw: frames that will not be painted (frame_skip) do not run the actor draw pass either; skip_draw=0 = always run it
   int frameSkip=1;   // (Claude v113: default 1 again: the user wants game speed independent of paint rate; v104-v112 default 0) game logic keeps 30 Hz: up to N frames in a row are not painted while the game runs behind real time (0 = off)
   bool rigidClip=false; // Experimental guarded clip rejection for rigid retained triangles.
-  bool paintFractional=false; // Experimental measured-cost paint budget; clock unchanged.
+  bool paintFractional=true; // (Claude v136: default ON - the renderer paints whenever its measured cost allows (40 ms -> 25 fps) instead of rounding up to every 2nd tick = 15 fps; console v132 render ~33-47 ms. Emulator sim +30 ms render: 15.0 -> 25.0 fps, game speed 100% both)
   int paintPacing=1;   // (Claude v120) paint_pacing=1: game logic on an absolute 30 Hz clock (catch-up when behind, sleep when ahead); a tick is painted
                        // only when the render core can take its frame without stalling the game, at a steady cadence (every K ticks, K adapts 1-4).
                        // 0 = v103-v119 frame_skip scheduler (game waits for the renderer: logic speed follows the paint rate)

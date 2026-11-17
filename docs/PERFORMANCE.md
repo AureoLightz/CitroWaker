@@ -13,6 +13,17 @@ Latest console measurement: build v132 on a physical New 3DS (November 2026). Em
 
 The target is a constant 30 FPS (33 ms per frame). Every stage above is still over that budget on heavy frames, so no single change reaches it; frame skipping is not used to fake it.
 
+### v136: paint pacing no longer rounds down to 15 fps
+
+The game logic always runs at 30 ticks per second; a tick is drawn when the renderer can take it. Until v135 the drawing cadence was a whole number of ticks (every tick = 30 fps, every 2nd = 15 fps), so a renderer needing 34–66 ms per frame always gave 15 fps. v136 paints whenever the renderer's measured cost has been earned (a 40 ms renderer gives 25 fps: 5 of every 6 ticks drawn). On console v132 the game thread slept more than half of the time in those 15 fps windows, so the renderer, not the game, was the limit.
+
+| Emulator simulation, render cost raised to console level (+30 ms) | Presented | Game speed |
+|---|---|---|
+| v135 whole-number cadence | 15.0 fps | 100% |
+| v136 fractional pacing | 25.0 fps | 100% |
+
+Console result pending.
+
 Process and render run on separate cores, but they still wait on each other and on the game thread, so the heavy-frame period (~80 ms) is longer than either stage alone. A typical Outset frame carries about 15,000 GameCube commands and about 500 draws.
 
 In an emulator profile of the same area, display-list traffic accounts for about two-thirds of process time, and nearly all of it comes from the game's model renderer (J3D).
