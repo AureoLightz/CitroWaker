@@ -48,7 +48,13 @@ All exact (the game behaves the same; the GX command stream is byte-identical):
 | Model draw lists (`J3D-drawBuffer`) | 1.98 | 1.67 |
 | Painter | 5.42 | 4.86 |
 
-The time saved shows up as waiting at frame end for the renderer (`after-draw` 0.6 → 1.5 ms), so in this scene the renderer side is now the limit. Console result pending.
+The time saved shows up as waiting at frame end for the renderer (`after-draw` 0.6 → 1.5 ms), so in this scene the renderer side is now the limit.
+
+**Console (v138, heavy Outset gameplay):** still about 10–13 fps (80–100 ms per presented frame); light stretches reach 26–30 fps. Per heavy frame: GX decode ("process") 59–73 ms, renderer 72 ms (draw submission 48 ms), and the game thread waits 17–22 ms per painted tick for the decoder to finish. Both decode and render are about twice what 25 fps allows, so the game-thread savings alone do not show up on hardware yet.
+
+### v139: allocator fallbacks
+
+The console log showed the per-thread small-block allocator running out of its span budget once gameplay starts, after which 30,000–165,000 allocations per 60 frames went to newlib's locked heap; the heaviest windows had the most. v139 hands out a free block from a larger size class instead (exact: a block always returns to the class it came from). v139 also carries a one-session console A/B (`N3DS_AB_KNOBS=1`) for this and two other exact options. Console result pending.
 
 ## What has been tried
 

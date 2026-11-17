@@ -111,8 +111,8 @@ inline void composeColumn(citro_settings::Canvas& c,const State& s){
     const int dy=pressed?1:0;
     if(i<3){
       badge(c,r.x+11,r.y+r.h/2+dy,keys[i],enabled);
-      const int tx=r.x+21,tw=r.w-23;
-      if(!has){c.center(tx,r.y+r.h/2-9+dy,tw,"-",0x52686c);continue;}
+      const int tx=r.x+23,tw=r.w-26;
+      if(!has){c.center(tx,r.y+r.h/2-9+dy,tw,"Empty",0x4d6569);continue;}
       char lines[2][40];const int n=wrap2(c,itemName(id),tw,lines);
       const unsigned col=enabled?0xfdf3d2:0x7d9397;
       if(n==1)c.center(tx,r.y+r.h/2-10+dy,tw,lines[0],col);
@@ -124,15 +124,33 @@ inline void composeColumn(citro_settings::Canvas& c,const State& s){
   if(s.fps)c.center(kGpuRows,221,320-kGpuRows,s.fpsText,0xffe6a3);
 }
 
+// A small key cap: rounded box around a label; returns its width.
+inline int keycap(citro_settings::Canvas& c,int x,int y,const char* label){
+  const int w=c.width(label)+12;
+  c.rect(x+1,y,w-2,22,0xc9b673);c.rect(x,y+1,w,20,0xc9b673);
+  c.rect(x+1,y+1,w-2,20,0x1d4f5c);c.rect(x+2,y+18,w-4,2,0x163f4a);
+  c.text(x+6,y+2,label,0xfff4cf,w);
+  return w;
+}
+
 // The left area for the CPU panel (no live map).
+// (Claude v139) header with an accent rule, a control legend of key caps instead of prose, one hint line, Settings button.
 inline void composeLeft(citro_settings::Canvas& c,const uint16_t* cloth,const State& s){
   for(int x=0;x<kGpuRows;++x)std::memcpy(c.pixels+x*240,cloth+x*240,240*2);
-  c.rect(12,10,196,40,0x0d2936);c.frame(12,10,196,40,0x547c85);
-  c.center(12,13,196,"CitroWaker",0xffe3a1);
-  c.center(12,30,196,"New 3DS",0x9dc1c6);
-  c.rect(12,62,196,124,0x0d2936);c.frame(12,62,196,124,0x30535d);
-  const char* lines[]={"Touch X, Y or Z to","use the item shown.","Menu opens the pause","menu. For the live map:","Settings > Bottom screen."};
-  for(int i=0;i<5;++i)c.text(20,68+i*22,lines[i],0xb9d2d4,184);
+  // header
+  c.rect(12,8,196,36,0x0d2936);c.frame(12,8,196,36,0x547c85);
+  c.center(12,16,196,"CitroWaker",0xffe3a1);
+  c.rect(40,38,140,1,0x30535d);for(int i=0;i<5;++i){const int h=i<3?i:4-i;c.rect(110-h,36+i,2*h+1,1,0xc9b673);}
+  // control legend
+  c.rect(12,52,196,136,0x0d2936);c.frame(12,52,196,136,0x30535d);
+  c.text(22,56,"Controls",0x9dc1c6,180);
+  c.rect(22,75,176,1,0x24434c);
+  const unsigned label=0xd7e6e6,dim=0x8fb0b4;
+  {int x=22;for(const char* k:{"X","Y","Z"}){x+=keycap(c,x,82,k)+3;}c.text(100,84,"Use item",label,104);}
+  keycap(c,22,108,"Menu");c.text(100,110,"Pause menu",label,104);
+  keycap(c,22,134,"Map");c.text(100,136,"Map size",label,104);
+  c.text(22,162,"Live map: Settings",dim,180);
+  // settings
   const bool enabled=true;   // the settings menu pauses the game itself: usable in any game state
   button(c,kSettingsButton,enabled,s.settingsPressed);
   c.center(kSettingsButton.x,kSettingsButton.y+5+(s.settingsPressed?1:0),kSettingsButton.w,"Settings  (START+SELECT)",enabled?0xffe6a4:0x7d9397);

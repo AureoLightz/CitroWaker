@@ -132,7 +132,7 @@ int main(int, char**) {
     n3dsLog("[cpu-mode] New3DS speedup 1 requested clock/L2 3 service %08lx configure %08lx\n",(unsigned long)cpuServiceResult,(unsigned long)cpuConfigureResult);
   }else n3dsLog("[cpu-mode] New3DS check %08lx result %d\n",(unsigned long)cpuModelResult,int(cpuIsNew));
 
-  n3dsLog("[build] CitroWaker v138 (Claude): GX FIFO writers inlined in game code; frame-end busy loop replaced by one division; collision scans stop at the last used element; no zero-fill of fully written joint/pane matrices; bottom panel left side cached. v137: MTXConcat reads inputs once (bit-identical, ~3x fewer instructions), frame pointer omitted. v136: paint pacing paints whenever the renderer can (fractional budget on: ~40 ms frames give 25 fps, not 15). v135: settings menu saves on hardware (rename onto an existing file failed with ENOENT); bottom-screen touch panel (X/Y/Z items, Menu, Map, Settings) working in panel and live-map modes. v134: 3.5 MB more memory for the renderer (smaller game heaps, measured over 8 areas). v133: texture pack on by default, self-checking (switches off if slower than converting). v132: VRAM report for dropped shadow copies. v131: night-sky stars drawn as one batch (file select: ~2000 draws -> ~100) and visible again (3-vertex quads = one triangle, as on GameCube); text glyphs of a string share one draw. v130: real shadows back (a failed copy no longer skips its clear: no grey silhouettes). v129: title music no longer waits behind big disc loads (DVD reads by size, large reads in 256 KB pieces); live map frame hidden on top; round shadows by default (grey silhouette blobs). v128: fast allocator capped at 64 spans (4 MB) so long sessions keep heap for draw replay. v127: runtime textures; fractional pacing and rigid clip OFF by default: full-width telescope covers; replay cache trims under pressure; prior v122: matrix groups replay from the previous frame, texture checks once per frame, resident geometry by pointer, interned uniform names, compile-cache hash halved, matrix slot memo, moving collision skips plane re-classification on pure translations. v121: <=2 logic ticks per painted frame, no catch-up bursts, present hold off\n");
+  n3dsLog("[build] CitroWaker v139 (Claude): fast allocator borrows larger free blocks instead of falling back to the locked heap; bottom panel control legend; N3DS_AB_KNOBS console A/B. v138: GX FIFO writers inlined in game code; frame-end busy loop replaced by one division; collision scans stop at the last used element; no zero-fill of fully written joint/pane matrices; bottom panel left side cached. v137: MTXConcat reads inputs once (bit-identical, ~3x fewer instructions), frame pointer omitted. v136: paint pacing paints whenever the renderer can (fractional budget on: ~40 ms frames give 25 fps, not 15). v135: settings menu saves on hardware (rename onto an existing file failed with ENOENT); bottom-screen touch panel (X/Y/Z items, Menu, Map, Settings) working in panel and live-map modes. v134: 3.5 MB more memory for the renderer (smaller game heaps, measured over 8 areas). v133: texture pack on by default, self-checking (switches off if slower than converting). v132: VRAM report for dropped shadow copies. v131: night-sky stars drawn as one batch (file select: ~2000 draws -> ~100) and visible again (3-vertex quads = one triangle, as on GameCube); text glyphs of a string share one draw. v130: real shadows back (a failed copy no longer skips its clear: no grey silhouettes). v129: title music no longer waits behind big disc loads (DVD reads by size, large reads in 256 KB pieces); live map frame hidden on top; round shadows by default (grey silhouette blobs). v128: fast allocator capped at 64 spans (4 MB) so long sessions keep heap for draw replay. v127: runtime textures; fractional pacing and rigid clip OFF by default: full-width telescope covers; replay cache trims under pressure; prior v122: matrix groups replay from the previous frame, texture checks once per frame, resident geometry by pointer, interned uniform names, compile-cache hash halved, matrix slot memo, moving collision skips plane re-classification on pure translations. v121: <=2 logic ticks per painted frame, no catch-up bursts, present hold off\n");
   // (Claude) The game needs the New 3DS's 124 MB mode (the CIA's exheader asks for it; the HOME Menu applies it when it starts the title).
   // Started some other way the console can stay in the 64 MB mode, where the game's memory does not fit: relaunch this title once through
   // APT (the system switches modes when it has to), and if that did not help either, say so on the screen instead of freezing.
@@ -366,6 +366,8 @@ static uint8_t g_spanClass[2048];                     // (p - g_base) >> 16 -> c
 static std::atomic<unsigned> g_spans{0};
 static std::atomic<bool> g_on{false};
 std::atomic<unsigned long> g_fallbacks{0};
+static std::atomic<unsigned long> g_borrowed{0}, g_classFallbacks[kClasses];
+std::atomic<bool> g_borrowOn{true};   // (Claude v139) N3DS_AB_KNOBS switches it (gpu_3ds.cpp)   // (Claude v139) larger-class blocks handed out; fallbacks per class
 struct Cache { Block* head[kClasses] = {}; uint16_t n[kClasses] = {}; };
 static thread_local Cache t_cache;
 static inline int spanClassOf(const void* p) {
@@ -400,7 +402,22 @@ static inline void* alloc(size_t n) {
   if (!t.head[c]) {
     Central& C = g_central[c];
     LightLock_Lock(&C.lock); const bool ok = refill(c); LightLock_Unlock(&C.lock);
-    if (!ok) { g_fallbacks.fetch_add(1, std::memory_order_relaxed); return nullptr; }
+    if (!ok) {
+      // (Claude v139) span budget used up and this class empty: a free block of a larger class (up to 4x the size) instead of a
+      // locked newlib malloc. Exact: free() finds the class from the block's span, so the block goes back where it came from.
+      if (g_borrowOn.load(std::memory_order_relaxed)) for (int c2 = c + 1; c2 < kClasses && kSize[c2] <= 4 * kSize[c]; c2++) {
+        if (!t.head[c2]) {
+          Central& C2 = g_central[c2];
+          if (!C2.head && C2.bump + kSize[c2] > C2.end) continue;   // nothing there (unlocked peek; refill below re-checks)
+          LightLock_Lock(&C2.lock); const bool ok2 = refill(c2); LightLock_Unlock(&C2.lock);
+          if (!ok2) continue;
+        }
+        Block* b = t.head[c2]; t.head[c2] = b->next; t.n[c2]--;
+        g_borrowed.fetch_add(1, std::memory_order_relaxed);
+        return b;
+      }
+      g_fallbacks.fetch_add(1, std::memory_order_relaxed); g_classFallbacks[c].fetch_add(1, std::memory_order_relaxed); return nullptr;
+    }
   }
   Block* b = t.head[c]; t.head[c] = b->next; t.n[c]--;
   return b;
@@ -429,7 +446,14 @@ void n3dsFastAllocEnable(bool on, int maxSpans) {
   fa::g_on.store(true);
   n3dsLog("[fast-alloc] on: classes <= 1024 B, at most %u spans of 64 KB\n", fa::kFaMaxSpans);
 }
-void n3dsFastAllocLog() { n3dsLog("[fast-alloc] spans %u (%u KB), fallbacks %lu\n", fa::g_spans.load(), unsigned(fa::g_spans.load() * 64), fa::g_fallbacks.load()); }
+void n3dsFastAllocBorrow(bool on) { fa::g_borrowOn.store(on, std::memory_order_relaxed); }
+void n3dsFastAllocLog() {
+  unsigned perClass[fa::kClasses] = {};
+  for (uint8_t v : fa::g_spanClass) if (v) perClass[v - 1]++;
+  char cls[256]; int at = 0;
+  for (int c = 0; c < fa::kClasses; c++) at += std::snprintf(cls + at, sizeof cls - at, " %u:%u/%lu", unsigned(fa::kSize[c]), perClass[c], fa::g_classFallbacks[c].load());
+  n3dsLog("[fast-alloc] spans %u (%u KB), fallbacks %lu, borrowed %lu; size:spans/fallbacks%s\n", fa::g_spans.load(), unsigned(fa::g_spans.load() * 64), fa::g_fallbacks.load(), fa::g_borrowed.load(), cls);
+}
 extern "C" {
 // (Claude v86) the renderer's block pools (uniform blocks, event nodes) keep freed blocks; when newlib cannot satisfy a request they are handed back first
 void n3dsPoolsTrim(void);   // gpu_3ds.cpp

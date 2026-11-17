@@ -74,7 +74,7 @@ extern "C" volatile unsigned g_n3dsShapeGen;   // (Claude v95) JKRHeap.cpp: mode
 extern "C" char* fake_heap_end;
 extern "C" { extern volatile int g_n3dsDlCensusOpen; void n3dsDlCensusWrite(const char*); }   // origin_prof_3ds.cpp (Claude v92)
 extern "C" void n3dsLockStatsLog(unsigned long frame); extern "C" void n3dsAllocSitesLog(unsigned long frame);   // main_3ds.cpp (Claude v74)
-void n3dsFastAllocEnable(bool on, int maxSpans = 0); void n3dsFastAllocLog();   // main_3ds.cpp (Claude v76)   // libctru: the end of the heap sbrk extends into
+void n3dsFastAllocEnable(bool on, int maxSpans = 0); void n3dsFastAllocLog(); void n3dsFastAllocBorrow(bool on);   // main_3ds.cpp (Claude v76)   // libctru: the end of the heap sbrk extends into
 static size_t brkRoom() { char* brk=(char*)sbrk(0); return brk && brk!=(char*)-1 && brk<fake_heap_end ? size_t(fake_heap_end-brk) : 0; }
 static uint64_t g_originTicks[2], g_originBytes[2], g_originDraws[2], g_originVerts[2], g_originCalls[2];
 static size_t g_minBrkRoom = ~size_t(0);   // lowest sbrk room seen by heapRoom since the last [pipeline] log
@@ -891,6 +891,14 @@ void n3dsGpuEndFrameLocal(void) {
   // (Claude v77) built-in A/B (auto_ab): both configurations give the same pixels; alternate them in 120-frame blocks so one play session measures both
   const int abSide=g_perf.autoAb?int((logFrame/120)&1):-1;
   // (Claude v83) the A/B switches nothing (see finishRecording); both blocks are logged
+  // (Claude v139) env N3DS_AB_KNOBS=1: console A/B of exact runtime options in one session, 300-frame phases cycling
+  // 0 = defaults, 1 = fast-alloc borrowing off, 2 = pack_vertex_major on, 3 = decode_overwrite on; "[ab-knobs]" lines
+  static const bool knobAb = std::getenv("N3DS_AB_KNOBS") != nullptr;
+  const int knob = knobAb ? int((logFrame / 300) % 4) : -1;
+  static const char* const kKnobNames[4] = {"defaults", "borrow off", "pack_vertex_major", "decode_overwrite"};
+  if (knob >= 0) { static int cur = -1;
+    if (knob != cur) { cur = knob; n3dsFastAllocBorrow(knob != 1); t2p::g_packVertexMajor = knob == 2 || g_perf.packVertexMajor;
+      t2p::g_decodedInitMode = (knob == 3 || g_perf.decodeOverwrite) ? 1 : 0; n3dsLog("[ab-knobs] frame %lu: config %d (%s)\n", (unsigned long)logFrame, knob, kKnobNames[knob]); } }
   if (g_r3dsTrace) g_r3dsTrace("end-frame: before renderFrame", 0);
   {   // (Claude v97) N3DS_AB_CYCLE: draw reuse switched here, on the render owner, between frames
     static int cur = -1; const int want = g_abDrawReuse.load();
@@ -918,6 +926,12 @@ void n3dsGpuEndFrameLocal(void) {
       for(int s=0;s<2;s++){const double n=abFrames[s]?abFrames[s]:1,m=abTimed[s]?abTimed[s]:1;
         n3dsLog("[ab] frame %lu side %d (%s): %u frames render %.2f present %.2f (%.2f fps) process %.2f ms; %u timed: build %.2f plan %.2f draw %.2f ms\n",(unsigned long)logFrame,s,s?"block B":"block A",abFrames[s],abRender[s]/n,abPresent[s]/n,abPresent[s]>0?1000.0*n/abPresent[s]:0.0,abProcess[s]/n,abTimed[s],abBuild[s]/m,abPlan[s]/m,abDraw[s]/m);}
     }
+  }
+  if (knob >= 0) {   // (Claude v139) per configuration: gameplay frames (100+ draws), the first 15 of each phase skipped
+    static double kP[4], kR[4], kQ[4]; static uint32_t kN[4];
+    if (F.draws >= 100 && logFrame % 300 >= 15 && presentMs > 0) { kP[knob] += presentMs; kR[knob] += renderMs; kQ[knob] += processMs; ++kN[knob]; }
+    if (logFrame % 1200 == 0) for (int s = 0; s < 4; s++) { const double n = kN[s] ? kN[s] : 1;
+      n3dsLog("[ab-knobs] frame %lu config %d (%s): %u frames present %.2f ms (%.2f fps) render %.2f process %.2f ms\n", (unsigned long)logFrame, s, kKnobNames[s], kN[s], kP[s] / n, kP[s] > 0 ? 1000.0 * n / kP[s] : 0.0, kR[s] / n, kQ[s] / n); }
   }
   if(presentMs>0){g_presentSum+=presentMs;++g_presentCount;g_presentMin=std::min(g_presentMin,presentMs);g_presentMax=std::max(g_presentMax,presentMs);}
   g_mem.frozen=false;
