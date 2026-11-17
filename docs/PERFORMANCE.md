@@ -1,17 +1,19 @@
 # Performance
 
-Status: November 12, 2026, build v92 measured on a physical New 3DS. Emulator figures are labelled as such.
+Latest console measurement: build v132 on a physical New 3DS (November 2026). Emulator figures are labelled as such.
 
-## Where the time goes (console, Outset gameplay)
+## Where the time goes (console, heavy Outset gameplay)
 
-| Per frame | Time |
-|---|---|
-| Process: decoding the game's GameCube GPU command stream (one core) | ~90–100 ms |
-| Render: building and submitting 3DS GPU work (another core) | ~80–90 ms |
-| Game logic | ~20 ms |
-| **Result** | **~10–12 FPS** |
+| Per frame | v92 | v132 |
+|---|---|---|
+| Process: decoding the game's GameCube GPU command stream (one core) | ~90–100 ms | ~44 ms |
+| Render: building and submitting 3DS GPU work (another core) | ~80–90 ms | ~47 ms |
+| Game logic (game thread, average) | ~20 ms | ~31 ms (heavy frames up to ~42 ms) |
+| **Frame period on heavy frames** | **~100 ms (~10 FPS)** | **~80 ms (~12 FPS)** |
 
-Process and render overlap on separate cores, so a frame costs about as much as the slower of the two. A typical Outset frame carries about 15,000 GameCube commands and about 500 draws.
+The target is a constant 30 FPS (33 ms per frame). Every stage above is still over that budget on heavy frames, so no single change reaches it; frame skipping is not used to fake it.
+
+Process and render run on separate cores, but they still wait on each other and on the game thread, so the heavy-frame period (~80 ms) is longer than either stage alone. A typical Outset frame carries about 15,000 GameCube commands and about 500 draws.
 
 In an emulator profile of the same area, display-list traffic accounts for about two-thirds of process time, and nearly all of it comes from the game's model renderer (J3D).
 

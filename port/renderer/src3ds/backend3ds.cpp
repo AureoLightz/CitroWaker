@@ -316,6 +316,7 @@ bool Backend3ds::allocRendered(TexEntry& e) {
   const MappedTexture& m = e.tex;
   if (!m.ok || m.width < 8 || m.height < 8 || m.width > 1024 || m.height > 1024 || (m.width & (m.width - 1)) || (m.height & (m.height - 1))) return fail("rendered texture size " + std::to_string(m.width) + "x" + std::to_string(m.height));
   if (m.fmt != PTF_RGBA8 && m.fmt != PTF_RGB8 && m.fmt != PTF_RGB5A1 && m.fmt != PTF_RGB565 && m.fmt != PTF_RGBA4) return fail("rendered texture format " + std::to_string(m.fmt) + " is not renderable");
+  if(e.user){auto* existing=reinterpret_cast<GpuTex*>(e.user);existing->gen=++g_texGen;return true;}
   for (size_t i = rtPool_.size(); i-- > 0;) {
     GpuTex* p = rtPool_[i];
     if (p->levels == 1 && p->tex.width == m.width && p->tex.height == m.height && p->tex.fmt == GPU_TEXCOLOR(m.fmt)) {
@@ -450,7 +451,8 @@ bool Backend3ds::copy(EfbCopyPlan& P, TextureCache& cache, C3D_RenderTarget* mai
   if (!P.ok) { st_.refused++; return fail("copy plan refused: " + P.why); }
   bool done = true;
   if (P.toTexture) {
-    TexEntry* e = cache.addRendered(P.tex);
+    TexEntry* e = cache.addRendered(P.tex,copyReuse_);
+    const bool reused=e&&e->user;
     if (!e || !allocRendered(*e)) {
       // (Claude, shadow fix) no memory for the copy's texture: the copy is lost, but its clear must still run. Returning here left the
       // real-shadow casters' silhouettes (and their depth) in the frame, so the scene could not draw over them: grey character
@@ -460,6 +462,7 @@ bool Backend3ds::copy(EfbCopyPlan& P, TextureCache& cache, C3D_RenderTarget* mai
       st_.copyAllocFails++;
       done = false;
     } else {
+    if(reused)++copyReuses_;
     GpuTex* g = reinterpret_cast<GpuTex*>(e->user);
     refreshViews(P.blit);
     C3D_FrameDrawOn(g->rt);

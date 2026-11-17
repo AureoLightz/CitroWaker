@@ -96,6 +96,7 @@ struct Performance3ds {
   bool snapshotSkip=true; // (Claude v102) textures the renderer's cache already holds are hashed, not copied, at frame end
   bool snapshotCopies=true; // (Claude v116) EFB copy destinations (GPU textures) are not copied at frame end
   bool earlyRelease=true;   // (Claude v115) early_release: the game thread resumes once the frame is decoded + snapshotted (not after the render hand-off)
+  bool copyReuse=false; // matching EFB copy destinations retain their VRAM target, experimental
   bool realShadows=true;   // (Claude v130: back on - the grey silhouettes were shadow copies whose clear was skipped when VRAM for the copy texture ran out; backend3ds copy now always clears) (Claude v114) real_shadows=0: round simple shadows
   bool skipDraw=true;   // (Claude v114) skip_draw: frames that will not be painted (frame_skip) do not run the actor draw pass either; skip_draw=0 = always run it
   int frameSkip=1;   // (Claude v113: default 1 again: the user wants game speed independent of paint rate; v104-v112 default 0) game logic keeps 30 Hz: up to N frames in a row are not painted while the game runs behind real time (0 = off)
@@ -162,6 +163,7 @@ struct Performance3ds {
       else if(!std::strcmp(key,"snapshot_copies")&&(!std::strcmp(val,"0")||!std::strcmp(val,"1")))snapshotCopies=*val=='1';
       else if(!std::strcmp(key,"audio_core1")&&(!std::strcmp(val,"0")||!std::strcmp(val,"1")))audioCore1=*val=='1';
       else if(!std::strcmp(key,"early_release")&&(!std::strcmp(val,"0")||!std::strcmp(val,"1")))earlyRelease=*val=='1';
+      else if(!std::strcmp(key,"copy_reuse")&&(!std::strcmp(val,"0")||!std::strcmp(val,"1")))copyReuse=*val=='1';
       else if(!std::strcmp(key,"real_shadows")&&(!std::strcmp(val,"0")||!std::strcmp(val,"1")))realShadows=*val=='1';
       else if(!std::strcmp(key,"skip_draw")&&(!std::strcmp(val,"0")||!std::strcmp(val,"1")))skipDraw=*val=='1';
       else if(!std::strcmp(key,"frame_skip")){const int v=atoi(val);if(v>=0&&v<=3)frameSkip=v;else ++errors;}

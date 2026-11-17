@@ -63,6 +63,7 @@ C3D_RenderTarget* C3D_RenderTargetCreate(int width, int height, GPU_COLORBUF col
 C3D_RenderTarget* C3D_RenderTargetCreateFromTex(C3D_Tex* tex, GPU_TEXFACE face, int level, C3D_DEPTHTYPE depthFmt);
 void C3D_RenderTargetDelete(C3D_RenderTarget* target);
 void C3D_RenderTargetSetOutput(C3D_RenderTarget* target, gfxScreen_t screen, gfx3dSide_t side, u32 transferFlags);
+void C3Dx_SetOutputRows(C3D_RenderTarget* target, u16 rows); // (Claude) transfer only the first rows (0 = all)
 
 static inline void C3D_RenderTargetDetachOutput(C3D_RenderTarget* target)
 {

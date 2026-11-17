@@ -310,7 +310,12 @@ class Renderer3ds : public GxSink {
   // through the affine map src -> dst (FitMode::Explicit; scissors map with it), with their own alpha / depth. The bottom target is made on first use and
   // linked to GFX_BOTTOM while routed draws keep arriving; `owner` is called with true when it takes the bottom screen and false when it gives it back
   // (after kRouteIdleFrames frames without a routed draw). Off: Route events are ignored (the draws stay on the top target, as before).
-  void setUiRoute(bool on, std::function<void(bool)> owner = {}) { routeOn_ = on; routeOwner_ = std::move(owner); }
+  // (Claude, release prep) the bottom target is made when routing is switched on (outside a frame), not at the first routed draw: its VRAM is then
+  // never a former EFB-copy texture (VRAM churns all game long), and a VRAM shortage shows at once instead of mid-game.
+  void setUiRoute(bool on, std::function<void(bool)> owner = {}) {
+    routeOn_ = on; routeOwner_ = std::move(owner);
+    if (on && !routeTarget_ && !routeFailed_) { routeTarget_ = C3D_RenderTargetCreate(240, 320, GPU_RB_RGBA8, GPU_RB_DEPTH24_STENCIL8); if (!routeTarget_) routeFailed_ = true; }
+  }
   bool uiRouteOwnsBottom() const { return routeLinked_; }
   C3D_RenderTarget* uiRouteTarget() const { return routeLinked_ ? routeTarget_ : nullptr; }   // diagnostics (read in the frame-begin hook)
   void onError(const std::string& e) override { if (errLog_) errLog_(e); }

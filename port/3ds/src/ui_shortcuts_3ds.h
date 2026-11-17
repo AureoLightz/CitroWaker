@@ -12,10 +12,11 @@ struct Rect {
 // approximately x12..212,y0..200. Footer starts at204.
 inline constexpr Rect mapContent{24,12,176,176};
 struct Target {Rect rect;uint32_t action;};
+// (Claude, release prep) one button column right of the map (bottom_panel_3ds.h): x 220..315.
 inline constexpr Target targets[]={
- {{240,12,72,54},N3DS_UI_ITEM_X},{{240,76,72,54},N3DS_UI_ITEM_Y},
- {{240,140,72,54},N3DS_UI_ITEM_Z},{{12,204,144,30},N3DS_UI_MENU},
- {{164,204,144,30},N3DS_UI_MAP_SIZE}
+ {{220,3,96,48},N3DS_UI_ITEM_X},{{220,55,96,48},N3DS_UI_ITEM_Y},
+ {{220,107,96,48},N3DS_UI_ITEM_Z},{{220,159,96,28},N3DS_UI_MENU},
+ {{220,191,96,28},N3DS_UI_MAP_SIZE}
 };
 inline constexpr uint32_t allActions=N3DS_UI_ITEM_X|N3DS_UI_ITEM_Y|N3DS_UI_ITEM_Z|N3DS_UI_MENU|N3DS_UI_MAP_SIZE;
 inline uint32_t actionsForItems(uint32_t enabled,uint32_t items){

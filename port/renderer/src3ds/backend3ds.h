@@ -38,6 +38,8 @@ class Backend3ds {
   void setKickDraws(int n){kickDraws_=n>0&&n<4096?n:0;}   // (Claude v120) start the GPU every n draws (C3Dx_FrameKick); 0 = at frame end only
   int kickDraws() const { return kickDraws_; }
   void setSplitStep(float f){splitStep_=f>0.005f&&f<=0.5f?f:0.25f;}   // (Claude) smaller steps start the GPU earlier in the frame; output unchanged
+  void setCopyReuse(bool on){copyReuse_=on;}
+  uint64_t copyReuses()const{return copyReuses_;}
   void setTextureBindingMemo(bool on){textureBindingMemo_=on;}
   const void* textureLevel0(const TexEntry& e, size_t& bytes, int& width, int& height) const;   // (Claude v91) diagnostics: the GPU copy of an entry
   using Log = std::function<void(const std::string&)>;
@@ -198,6 +200,7 @@ class Backend3ds {
   uint8_t boundKey_[3] = {0, 0, 0}; // 0 unknown, 1 disabled, 2 enabled
   TextureBindingKey boundSampler_[3];
   bool textureBindingMemo_=true;
+  bool copyReuse_=false;uint64_t copyReuses_=0;
   PixelRect scissor_;
   bool scissorValid_ = false;
   uint64_t lastHashes_[3] = {}; const void* lastIndices_ = nullptr; uint32_t lastIndexCount_ = 0;   // (Claude v119) the plan draw() issued last

@@ -28,9 +28,8 @@ struct ModalGuard {
 inline void menuApplyPresentation(void* ptr){
  const auto& m=*static_cast<Model*>(ptr);
  g_perf.bottomUi=m.value[1]!=0;g_perf.uiMapBottom=m.value[1]==2;
- if(g_r)g_r->setUiRoute(g_perf.bottomUi&&g_perf.uiMapBottom,[](bool owns){
-  g_routeOwnsBottom.store(owns,std::memory_order_release);n3dsUiSetGpuOwnsBottom(owns?1:0);
- });
+ n3ds_ui::panelOn.store(g_perf.bottomUi,std::memory_order_release);
+ if(g_r)g_r->setUiRoute(g_perf.bottomUi&&g_perf.uiMapBottom,routeOwnerChanged);
  g_bottomUi.init();
  n3dsLog("[settings] bottom screen live mode %d\n",m.value[1]);
 }

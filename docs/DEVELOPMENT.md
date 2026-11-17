@@ -87,7 +87,7 @@ The default physical mapping is:
 | ZL or ZR | Z |
 | START | START / pause |
 | D-pad | D-pad |
-| SELECT + START | Z, suppressing the individual START action |
+| SELECT + START | Opens the CitroWaker settings menu (pauses the game) |
 
 SELECT alone is unassigned as a game action; development builds use it to save a diagnostic capture (colour, depth and, on the first press, the textures in use) to `/3ds/ww3ds/`. Consult that build’s notes.
 
@@ -103,7 +103,7 @@ Restart after editing. A physical mapping is separate from a touchscreen shortcu
 
 ### Touchscreen interface
 
-The intended layout keeps a live map on the bottom screen, three customizable item shortcuts on the right, and **Menu** / **Map zoom** along the bottom. The footer actions and layout stay fixed; only the three item actions are customizable.
+The bottom screen shows a column of touch buttons on the right: **X**, **Y** and **Z** (each labelled with the item currently assigned), **Menu** (pause menu) and **Map**. Buttons are active whenever the game's own HUD shows them as usable, and greyed out during cutscenes and conversations. The left part shows either the CitroWaker panel with a **Settings** button, or, with *Settings > Display > Bottom screen: Live map*, the game's minimap drawn on the bottom screen. Only the three item actions are customizable (`shortcuts.ini`).
 
 ```ini
 # /3ds/ww3ds/shortcuts.ini

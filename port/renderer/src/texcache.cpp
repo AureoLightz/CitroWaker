@@ -465,7 +465,30 @@ const TexEntry* TextureCache::renderedAt(uint32_t addr) const {
   return e == entries_.end() ? nullptr : e->second.second.get();
 }
 
-TexEntry* TextureCache::addRendered(const RenderedTexture& r) {
+TexEntry* TextureCache::addRendered(const RenderedTexture& r, bool reuse) {
+  // Ordered copies overwrite the entire padded target. Keep matching storage
+  // instead of allocating another VRAM image for the same GX destination.
+  if (reuse) if (auto* e = const_cast<TexEntry*>(renderedAt(r.addr))) {
+    if (e->user && e->tex.levels == 1 && e->cost == r.cost &&
+        e->tex.width == r.allocW && e->tex.height == r.allocH && e->tex.fmt == r.pfmt &&
+        e->gxFmt == r.gxFmt && e->gxW == r.gxW && e->gxH == r.gxH &&
+        e->portW == r.portW && e->portH == r.portH &&
+        e->srcBytes == (r.guestBytes ? r.guestBytes : 1u)) {
+      std::vector<uint32_t> dead;
+      for (const auto& kv : entries_) {
+        const auto& other = *kv.second.second;
+        if (other.id != e->id && uint64_t(other.addr) < uint64_t(r.addr) + e->srcBytes &&
+            uint64_t(other.addr) + other.srcBytes > r.addr) dead.push_back(other.id);
+      }
+      for (auto id : dead) { erase(id); st_.invalidated++; }
+      ++quickGen_;
+      e->lastUseFrame = frame_;
+      e->tex.exact = r.notes.empty();
+      e->tex.notes = r.notes;
+      e->renderedNotes = r.notes;
+      return e;
+    }
+  }
   const uint32_t guest = r.guestBytes ? r.guestBytes : 1u;
   invalidateRange(r.addr, guest);   // the copy overwrote that memory: converted entries and older copies in the range are stale
   std::unique_ptr<TexEntry> e(new TexEntry());

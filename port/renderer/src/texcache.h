@@ -167,7 +167,7 @@ class TextureCache {
   void invalidateAll();
   // Registers an EFB copy as a texture. A copy overwrites guest memory, so converted entries overlapping its range and older rendered copies there are dropped
   // (the evict callback fires for them). The returned entry has `user == 0`: the host allocates its GPU texture (size allocW x allocH, format pfmt) and sets it.
-  TexEntry* addRendered(const RenderedTexture& r);
+  TexEntry* addRendered(const RenderedTexture& r, bool reuse=false);
   // The rendered copy currently living at a guest address (nullptr: none). For hosts that read the copy back (the hwcheck6 dump, debug views).
   const TexEntry* renderedAt(uint32_t addr) const;
   // Copy dimensions may need padding even when the GX binding is power-of-two.

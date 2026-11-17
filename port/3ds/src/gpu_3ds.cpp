@@ -331,6 +331,16 @@ void push32(std::vector<uint8_t>& v, uint32_t x) {
 
 }  // namespace
 
+// (Claude, release prep) the live map takes / gives back the bottom screen (render owner thread). While it has it, its transfer
+// writes only the map half; the panel's button column stays the CPU's (bottom_ui_3ds.h paintColumn).
+extern "C" void C3Dx_SetOutputRows(C3D_RenderTarget* target, u16 rows);   // n3ds/citro3d renderqueue.c
+static void routeOwnerChanged(bool owns){
+  g_routeOwnsBottom.store(owns,std::memory_order_release);n3dsUiSetGpuOwnsBottom(owns?1:0);
+  static const bool fullRows=std::getenv("N3DS_ROUTE_FULL")!=nullptr;   // TEST: old whole-screen transfer
+  if(owns&&g_r&&!fullRows)if(C3D_RenderTarget* t=g_r->uiRouteTarget())C3Dx_SetOutputRows(t,n3ds_panel::kGpuRows);
+  g_bottomUi.ownerChanged();
+  n3dsLog("[ui-route] bottom screen %s\n",owns?"taken by the map route":"given back");
+}
 #include "settings_menu_3ds.h"
 
 extern "C" {
@@ -601,6 +611,8 @@ int n3dsGpuInitLocal(void) {
     if (!g_shotFrames.empty()) g_shots = std::fopen(N3DS_ROOT "/shots.bin", "wb");
   }
   g_r->setFrameBeginHook([] {   // the previous frame's picture is in the colour buffer now
+    if(g_perf.bottomUi&&g_routeOwnsBottom.load(std::memory_order_acquire)){g_bottomUi.paintColumn();g_bottomUi.captureRouted((unsigned long)g_frames.load());
+      }   // (Claude, release prep)
     static int idState = 0;   // (Claude v101) 1: the frame that just ended was drawn in draw-ID mode, capture it now
     if (idState == 1 && g_tgt) {
       idState = 0;
@@ -695,12 +707,12 @@ int n3dsGpuInitLocal(void) {
   if(g_perf.preparedDraw)n3dsLog("[prepared] draw commands loaded %d\n",int(g_r->backend().loadPreparedDraw(N3DS_ROOT "/ww_commands.cwcp")));
   g_r->setCommandBlocks(g_perf.commandBlocks);n3dsLog("[model] command_blocks %d\n",int(g_perf.commandBlocks));
   g_r->setRigidClip(g_perf.rigidClip);n3dsLog("[clip] rigid_clip %d\n",int(g_perf.rigidClip));
+  g_r->backend().setCopyReuse(g_perf.copyReuse);n3dsLog("[copy-reuse] enabled %d\n",int(g_perf.copyReuse));
   g_r->setPlanReuse(g_perf.planReuse);
   g_r->setPlanDelta(g_perf.planReuse&&g_perf.planDelta,std::getenv("N3DS_PLAN_DELTA_VERIFY")!=nullptr);   // (Claude v87)
   n3dsLog("[perf] plan_delta %d\n",int(g_perf.planReuse&&g_perf.planDelta));
-  if(g_perf.uiMapBottom && g_perf.bottomUi) g_r->setUiRoute(true,[](bool owns){   // (Claude v80) render owner: the bottom screen changes hands
-    g_routeOwnsBottom.store(owns,std::memory_order_release);n3dsUiSetGpuOwnsBottom(owns?1:0);
-    n3dsLog("[ui-route] bottom screen %s\n",owns?"taken by the map route":"given back");});
+  n3ds_ui::panelOn.store(g_perf.bottomUi,std::memory_order_release);
+  if(g_perf.uiMapBottom && g_perf.bottomUi) g_r->setUiRoute(true,routeOwnerChanged);   // (Claude v80) render owner: the bottom screen changes hands
   n3dsLog("[perf] ui_map_bottom %d\n",int(g_perf.uiMapBottom && g_perf.bottomUi));
   g_r->setStateNotes(!g_perf.leanState);
   g_r->setRetainGeometry(g_perf.retainGeometry);   // (Claude v83) the renderer's pack cache follows the recorder's retained geometry
@@ -992,7 +1004,7 @@ void n3dsGpuEndFrameLocal(void) {
       n3dsLog("[replay] budget %u KB (entries %u KB, heap free %u KB)\n", unsigned(want >> 10), unsigned(used >> 10), unsigned(freeB >> 10));
     }
     n3dsBigAllocReport();
-    if (g_r) n3dsLog("[copy] rendered-texture allocations failed so far: %u (copy lost, clear kept); VRAM free %u KB, render-target pool %u, rendered textures %u holding %u KB VRAM\n", unsigned(g_r->backend().stats().copyAllocFails), unsigned(vramSpaceFree() / 1024), unsigned(g_r->backend().rtPoolSize()), unsigned(g_r->backend().stats().rtLive), unsigned(g_r->backend().stats().rtVramBytes / 1024));   // (Claude, shadow fix)
+    if (g_r) n3dsLog("[copy] rendered-texture allocations failed so far: %u (copy lost, clear kept); VRAM free %u KB, render-target pool %u, rendered textures %u holding %u KB VRAM, reused %llu\n", unsigned(g_r->backend().stats().copyAllocFails), unsigned(vramSpaceFree() / 1024), unsigned(g_r->backend().rtPoolSize()), unsigned(g_r->backend().stats().rtLive), unsigned(g_r->backend().stats().rtVramBytes / 1024), (unsigned long long)g_r->backend().copyReuses());   // (Claude, shadow fix)
     n3dsLog("[fifo] drain stalls %u\n", n3dsFifoDrainStalls);
   }
   if (frameLogged && g_frameLogCount < kFrameLogMax) {
@@ -1507,7 +1519,7 @@ void n3dsHidRead(N3dsPad* p) {
   u32 k = hidKeysHeld();
   static u32 menuHeld=0;static bool menuTestDone=false;static const bool menuTestRequested=std::getenv("N3DS_SETTINGS_TEST")!=nullptr;
   bool menuTouch=false;
-  if((hidKeysDown()&KEY_TOUCH)&&g_perf.bottomUi&&!n3ds_ui::gpuOwnsBottom.load(std::memory_order_acquire)&&n3ds_ui::Presentation{n3ds_ui::presentationWord.load(std::memory_order_acquire)}.alpha()==255){touchPosition t{};hidTouchRead(&t);menuTouch=t.px>=20&&t.px<300&&t.py>=206&&t.py<232;}
+  if((hidKeysDown()&KEY_TOUCH)&&g_perf.bottomUi&&!n3ds_ui::gpuOwnsBottom.load(std::memory_order_acquire)){touchPosition t{};hidTouchRead(&t);menuTouch=n3ds_panel::kSettingsButton.contains(t.px,t.py);}   // (Claude, release prep) the panel's Settings button
   const bool menuTest=!menuTestDone&&menuTestRequested&&g_inputFrames.load()>=620;
   if(menuTest||menuTouch||((k&(KEY_START|KEY_SELECT))==(KEY_START|KEY_SELECT)&&(hidKeysDown()&(KEY_START|KEY_SELECT)))){
     menuTestDone=true;const bool hadAccel=n3ds_motion::enabled[1],hadGyro=n3ds_motion::enabled[2];n3dsMotionStop();try{citro_settings::runMenu(menuTest);}catch(...){n3dsLog("[settings] unable to open or save (allocation failure)\n");}if(hadAccel)n3dsMotionEnable(1,1);if(hadGyro)n3dsMotionEnable(2,1);hidScanInput();menuHeld=hidKeysHeld();std::memset(p,0,sizeof *p);return;

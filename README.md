@@ -8,13 +8,21 @@
 </p>
 
 <p align="center">
-  <a href="#the-project">The project</a> &nbsp; · &nbsp;
+  <a href="#install-in-three-steps"><b>Install</b></a> &nbsp; · &nbsp;
+  <a href="#the-bottom-screen">Bottom screen</a> &nbsp; · &nbsp;
   <a href="#development-status">Status</a> &nbsp; · &nbsp;
-  <a href="#getting-started">Getting started</a> &nbsp; · &nbsp;
+  <a href="docs/PERFORMANCE.md">Performance</a> &nbsp; · &nbsp;
   <a href="docs/DEVELOPMENT.md">Development guide</a>
 </p>
 
-> **In development.** Gameplay runs on real New 3DS hardware. Rendering, performance and stability work continues; full-game completion is unverified. Selected source components and tools are now available below; there is no downloadable game build yet.
+<p align="center">
+  <img alt="New 3DS family" src="https://img.shields.io/badge/console-New%203DS%20%C2%B7%20New%202DS%20XL-1d4f5c">
+  <img alt="Installer for Windows and Linux" src="https://img.shields.io/badge/installer-Windows%20%C2%B7%20Linux-c9b673">
+  <img alt="Bring your own USA disc" src="https://img.shields.io/badge/disc-your%20own%20GZLE01-30535d">
+  <img alt="MIT licence for project code" src="https://img.shields.io/badge/licence-MIT-0e2530">
+</p>
+
+> **Early release.** Gameplay runs on real New 3DS hardware, with sound, saves and the touch screen. It is **not full speed yet** (heavy scenes run around 12 fps on console) and some console rendering faults remain; full-game completion is unverified. Keep backups of `/3ds/ww3ds/user/`.
 
 ## The project
 *AI DISCLAIMER* Codex and Claude Code were used for a solid chunk of this, as a college student i literally do not have the time to do it all alone.
@@ -38,66 +46,85 @@ The goal is the original adventure with controls and presentation that belong on
 </tr>
 </table>
 
-<sub>Unmodified Azahar captures · November 12, 2026 · Emulator images do not establish real-console rendering correctness or performance.</sub>
+<sub>Unmodified Azahar captures · Emulator images do not establish real-console rendering correctness or performance.</sub>
 
-## Built around the handheld
+## Install in three steps
 
-| Familiar adventure | Handheld controls | Two-screen presentation |
-| :--- | :--- | :--- |
-| Native game code and an original-game fidelity goal. | Circle Pad movement, C-stick camera and physical button remapping. | Live-map routing and customizable touch shortcuts, with panel integration still underway. |
+You need a **New** 3DS / 3DS XL / 2DS XL with custom firmware and [FBI](https://github.com/Steveice10/FBI), and **your own** USA disc image of *The Wind Waker* (`GZLE01`, plain `.iso`). Nothing from the game is downloaded or included.
 
-Optional sailing, grappling, text and song-replay hooks are implemented in the development tree. **Gyro aiming is opt-in and still needs physical sensor validation.** Feature inclusion and validation vary by build.
+<table>
+<tr>
+<td width="55%">
 
-[Controls & development guide →](docs/DEVELOPMENT.md#controls) &nbsp; · &nbsp; [QoL & gyro →](QOL.md) &nbsp; · &nbsp; [Touch shortcuts →](SHORTCUTS.md)
+1. **Download** the installer for your PC and `CitroWaker.cia` from [**Releases**](https://github.com/AureoLightz/CitroWaker/releases) into one folder.
+2. **Run the installer**, choose your disc image, plug in the SD card (it is found automatically) and press **Install**. It checks your disc, copies everything to the card and can build the optional texture pack from your disc.
+3. **On the 3DS**, open FBI › *SD* › *cia* › `CitroWaker.cia` › *Install CIA*, then start CitroWaker from the HOME Menu.
+
+| PC | Download |
+| :--- | :--- |
+| Windows 10/11 | `CitroWaker-Installer.exe` |
+| Linux x86-64 | `CitroWaker-Installer-linux-x86_64` |
+
+Updating? Run the installer again: your saves in `/3ds/ww3ds/user/` are never touched and a disc image already on the card is not copied twice. [Installer details & command line →](installer/README.md)
+
+</td>
+<td width="45%" align="center">
+<img src="assets/installer.png" alt="The CitroWaker Installer window: disc image, SD card and game file steps with an Install button" width="100%"><br>
+<sub>The installer (Linux shown; Windows looks the same).</sub>
+</td>
+</tr>
+</table>
+
+The original 3DS and 2DS are not supported. Wrong-region, later-revision, trimmed or compressed (RVZ/CISO) images are rejected with instructions to fix them.
+
+## The bottom screen
+
+<table>
+<tr>
+<td width="50%" align="center">
+<img src="assets/bottom-panel.png" alt="CitroWaker bottom screen: a Settings button on the left and X, Y, Z, Menu and Map touch buttons on the right" width="100%"><br>
+<strong>Touch panel</strong><br>
+<sub>Touch X, Y or Z to use the assigned item, Menu for the pause menu, Settings for CitroWaker's options.</sub>
+</td>
+<td width="50%" align="center">
+<img src="assets/bottom-livemap.png" alt="CitroWaker bottom screen showing the game's live map next to the touch buttons" width="100%"><br>
+<strong>Live map</strong><br>
+<sub>Optional: the game's minimap drawn on the bottom screen (<i>Settings › Bottom screen</i>).</sub>
+</td>
+</tr>
+</table>
+
+Buttons follow the game's own HUD: usable when the game allows the action, greyed out in cutscenes and conversations. **START + SELECT** opens the settings menu anywhere; changes are saved to the SD card. [Controls →](docs/DEVELOPMENT.md#controls) &nbsp; · &nbsp; [QoL & gyro →](QOL.md) &nbsp; · &nbsp; [Touch shortcuts →](SHORTCUTS.md)
 
 ## Development status
 
 | Area | Current state |
 | :--- | :--- |
 | **Game & audio** | Boots and reaches gameplay on real New 3DS; sound and physical controls run. |
-| **Graphics** | Custom GX-to-PICA renderer. Console depth, cloud and other visual faults remain under investigation. |
-| **Performance** | Heavy scenes need optimization. Hardware measurements guide the work; emulator FPS is reported separately. |
-| **Saving** | SD-backed memory cards are implemented. Save-related failures have been reported; keep backups. |
-| **Touch & QoL** | Development features with differing integration and validation status. Design previews are not proof of shipped functionality. |
-| **Release** | Original platform components, setup/report/showcase tools and host tests are published. No CIA or complete port source release yet. |
-
-[Measured performance →](docs/PERFORMANCE.md) &nbsp; · &nbsp; [Console findings →](docs/CONSOLE_FINDINGS.md)
+| **Graphics** | Custom GX-to-PICA renderer. Some console depth, cloud and shadow faults remain under investigation. |
+| **Performance** | Not yet at speed: heavy scenes on console measure about 12 fps (80 ms frames); the GPU command translation is the bottleneck and the main focus. Console numbers in [Performance](docs/PERFORMANCE.md); emulator FPS is not console FPS. |
+| **Saving** | SD-backed memory cards; the settings menu now saves on hardware. Keep backups of `/3ds/ww3ds/user/`. |
+| **Touch & QoL** | Bottom-screen touch panel and optional live map; QoL and gyro options are opt-in. |
+| **Release** | Installer, CIA, port sources and host tests published. |
 
 ### Where we're heading
 
-1. **Correctness and stability:** resolve console rendering faults and save/transition failures.
-2. **Every-frame performance:** reduce command decoding, memory traffic and draw preparation while preserving the game.
-3. **A complete handheld interface:** finish the live map, touch shortcuts and context-aware bottom screen.
+1. **Every-frame performance:** a constant 30 fps on console by cutting command decoding, memory traffic and draw preparation.
+2. **Correctness and stability:** console rendering faults and scene-change stalls.
+3. **Handheld polish:** live map on by default once its video memory cost is gone.
 
-PC-side game-data preparation and a direct model-rendering path are being explored. They are development work, not promised speedups.
-
-## Try the published code
-
-The first reviewed source components are available now:
+## Source and tools
 
 | Component | Start here |
 | :--- | :--- |
-| **Local PC setup app** | [Windows/Linux source and launchers](tools/setup) — bundled texture conversion; supply your existing compatible CIA and material bundles. |
-| **3DS platform code** | [NDSP audio, touch/lifecycle logic and configuration](platform/n3ds) — asset-free components from the port. |
-| **PC texture converter** | [Buildable extractor and converter](tools/texture-pack) — process your own ISO locally; no SDK needed. |
-| **Console log reports** | [Summarize and compare timings](tools/console-report) — no game or emulator required. |
-| **Host tests** | Run `python3 tests/run.py` with Python 3.10+ and a C++17 compiler; use `--python-only` for the Python tests. |
+| **Installer** | [Windows/Linux GUI and command line](installer) |
+| **Port source** | [3DS game layer, renderer and citro3d changes](port) |
+| **3DS platform code** | [NDSP audio, touch/lifecycle logic and configuration](platform/n3ds) |
+| **PC texture converter** | [Buildable extractor and converter](tools/texture-pack): process your own ISO locally. |
+| **Console log reports** | [Summarize and compare timings](tools/console-report) |
+| **Host tests** | `python3 tests/run.py` with Python 3.10+ and a C++17 compiler (`--python-only` for the Python tests). |
 
-[Source scope, dependencies & licence →](docs/SOURCE.md) &nbsp; · &nbsp; [Player-release progress →](docs/PLAYER_RELEASE.md)
-
-## Getting started
-
-**PC preparation is working; the public CIA is not ready yet.** See [the player-install guide and release gates](docs/PLAYER_RELEASE.md). This page documents the project and the experimental builds already in testing; the published components do not yet build the complete port.
-
-For a compatible experimental CIA you already have:
-
-1. **Prepare your data.** Use your own USA GameCube disc image (`GZLE01`) and locally prepared bundles in `/3ds/ww3ds/`.
-2. **Install the CIA.** Exit the installer and launch from the HOME Menu.
-3. **Keep your saves.** Preserve `/3ds/ww3ds/user/` when updating.
-
-The original 3DS and 2DS are not supported targets. The project supplies no ISO, extracted game assets or Nintendo music. Existing `ww3ds` data/configuration paths remain unchanged after the rename.
-
-[Installation, data layout & prerequisites →](docs/DEVELOPMENT.md#installation)
+[Source scope, dependencies & licence →](docs/SOURCE.md) &nbsp; · &nbsp; [Player-release notes →](docs/PLAYER_RELEASE.md)
 
 ## Beyond Outset
 
@@ -115,7 +142,7 @@ The [Python + FFmpeg showcase tool](tools/showcase/README.md) adds timing graphs
 
 | For players | For developers |
 | :--- | :--- |
-| [Installation & controls](docs/DEVELOPMENT.md#installation) | [Development arrangement](docs/DEVELOPMENT.md#building-from-source) |
+| [Install with the installer](#install-in-three-steps) | [Development arrangement](docs/DEVELOPMENT.md#building-from-source) |
 | [QoL & gyro settings](QOL.md) | [Performance measurements](docs/PERFORMANCE.md) |
 | [Touch shortcut status](SHORTCUTS.md) | [Hardware findings](docs/CONSOLE_FINDINGS.md) |
 | [Report an issue](https://github.com/AureoLightz/CitroWaker/issues) | [Timing-overlay tool](tools/showcase/README.md) |

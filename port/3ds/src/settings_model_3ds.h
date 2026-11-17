@@ -68,12 +68,15 @@ struct Model {
   if(std::fclose(f)!=0)ok=false;
   if(!ok){std::remove(tmp.c_str());return false;}
   if(std::rename(tmp.c_str(),path)==0){std::remove(bak.c_str());return true;}
-  // Some FAT implementations refuse replacing a destination. Keep a recovery
-  // copy until the new complete file is in place; startup can read this backup.
-  if(errno!=EEXIST&&errno!=ENOTEMPTY){std::remove(tmp.c_str());return false;}
+  // The 3DS SD archive refuses to rename onto an existing file, and libctru then
+  // retries as a directory rename and reports ENOENT (console v132 log: "save
+  // failed errno 2"). Move the old file aside whatever errno says, put the new
+  // one in place, and keep the backup until that worked (startup reads
+  // performance.ini.ui.bak when performance.ini is missing).
   if(std::remove(bak.c_str())!=0&&errno!=ENOENT){std::remove(tmp.c_str());return false;}
-  if(std::rename(path,bak.c_str())!=0){std::remove(tmp.c_str());return false;}
-  if(std::rename(tmp.c_str(),path)!=0){std::rename(bak.c_str(),path);std::remove(tmp.c_str());return false;}
+  const bool moved=std::rename(path,bak.c_str())==0;
+  if(!moved){if(FILE* still=std::fopen(path,"rb")){std::fclose(still);std::remove(tmp.c_str());return false;}}
+  if(std::rename(tmp.c_str(),path)!=0){if(moved)std::rename(bak.c_str(),path);std::remove(tmp.c_str());return false;}
   std::remove(bak.c_str());return true;
  }
 };

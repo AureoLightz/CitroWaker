@@ -2,6 +2,8 @@
 #include <c3d/base.h>
 #include <c3d/renderqueue.h>
 #include <stdlib.h>
+static C3D_RenderTarget* outRowsTarget[3];   // (Claude) C3Dx_SetOutputRows
+static u16 outRowsCount[3];
 
 static C3D_RenderTarget *firstTarget, *lastTarget;
 static C3D_RenderTarget *linkedTarget[3];
@@ -264,7 +266,17 @@ void C3D_FrameEnd(u8 flags)
 		if (!target || !target->used)
 			continue;
 		target->used = false;
-		C3D_FrameBufTransfer(&target->frameBuf, target->screen, target->side, target->transferFlags);
+		{   // (Claude, release prep) C3Dx_SetOutputRows: only the first N framebuffer rows go to the screen
+			u16 rows = 0;
+			for (int k = 0; k < 3; k ++) if (outRowsTarget[k] == target) rows = outRowsCount[k];
+			if (rows && rows < target->frameBuf.height)
+			{
+				u32* out = (u32*)gfxGetFramebuffer(target->screen, target->side, NULL, NULL);
+				u32 dim = GX_BUFFER_DIM((u32)target->frameBuf.width, (u32)rows);
+				GX_DisplayTransfer((u32*)target->frameBuf.colorBuf, dim, out, dim, target->transferFlags);
+			} else
+				C3D_FrameBufTransfer(&target->frameBuf, target->screen, target->side, target->transferFlags);
+		}
 		if (target->screen == GFX_TOP)
 		{
 			needSwapTop = true;
@@ -280,6 +292,19 @@ void C3D_FrameEnd(u8 flags)
 	gxCmdQueueRun(&ctx->gxQueue);
 	if (ctx->gxQueue.lastEntry >= ctx->gxQueue.numEntries)
 		staleGuard = false;   // (Claude v120) nothing was queued: no callback will come
+}
+
+// (Claude, release prep) partial screen output: the transfer of `target` writes only its first `rows` rows (screen
+// columns for the rotated 3DS screens); the rest of the framebuffer keeps what the CPU put there. 0 = whole target.
+void C3Dx_SetOutputRows(C3D_RenderTarget* target, u16 rows)
+{
+	int freeSlot = -1;
+	for (int k = 0; k < 3; k ++)
+	{
+		if (outRowsTarget[k] == target) { outRowsCount[k] = rows; if (!rows) outRowsTarget[k] = NULL; return; }
+		if (!outRowsTarget[k] && freeSlot < 0) freeSlot = k;
+	}
+	if (rows && freeSlot >= 0) { outRowsTarget[freeSlot] = target; outRowsCount[freeSlot] = rows; }
 }
 
 void C3D_FrameEndHook(void (* hook)(void*), void* param)
