@@ -7,21 +7,21 @@
 #   bash build.sh relink     only link
 set -eu
 here=$(cd "$(dirname "$0")" && pwd); cd "$here"
-SW=$HOME/ww-port/SwitchWaker
+SW=${N3DS_SW:-$HOME/ww-port/SwitchWaker}
 # (Claude, release prep) N3DS_PUBLIC=1: asset-free build. Compiles the isolated tree made by public/make_tree.sh (stub asset headers,
 # COS_RUNTIME_ASSETS=1: the game's data arrays are read from the player's ISO at start) into its own objects and outputs under
 # public-build/ (bind-mounted over obj/, obj3ds/, all.sh, ww3ds.elf/.3dsx in the container), so public and private objects never mix.
 PUB=${N3DS_PUBLIC:-0}
 PUBMOUNTS=()
 if [ "$PUB" = 1 ]; then
-  SW=$HOME/ww-port/public/SwitchWaker
+  SW=${N3DS_SW:-$HOME/ww-port/public/SwitchWaker}
   [ -f "$SW/.public-tree-stamp" ] || { echo "no public tree: run bash public/make_tree.sh"; exit 1; }
   P=$here/public-build; mkdir -p "$P/obj" "$P/obj3ds" "$P/log"
   for f in all.sh todo.sh ww3ds.elf ww3ds.3dsx link.log; do [ -e "$P/$f" ] || : > "$P/$f"; done
   for d in obj obj3ds log; do PUBMOUNTS+=(-v "$P/$d:/arm/$d:z"); done
   for f in all.sh todo.sh ww3ds.elf ww3ds.3dsx link.log; do PUBMOUNTS+=(-v "$P/$f:/arm/$f:z"); done
 fi
-HW6=$HOME/Downloads/ww-replay3ds/hw6
+HW6=${N3DS_HW6:-$HOME/Downloads/ww-replay3ds/hw6}
 mode=${1:-all}
 # one build at a time (Claude and ChatGPT both build into obj/, obj3ds/ and ww3ds.elf; see COORDINATION.md)
 exec 7>/tmp/ww3ds-build.lock; echo "waiting for the build lock..." >&2; flock 7
@@ -219,7 +219,7 @@ EOF3
   for f in fifo_3ds.cpp GXFrameBuffer_3ds.cpp dvd_3ds.cpp; do cmp -s gen/$f.new gen/$f || mv gen/$f.new gen/$f; rm -f gen/$f.new; done
 fi
 
-podman run --rm --memory=3g --memory-swap=3g --cpus=4 -e N3DS_RENDER_OPT -e N3DS_RENDER_LTO -e N3DS_PGO -e N3DS_EVENT_INDIRECT -v "$SW:/work:z" -v "$here:/arm:z" "${PUBMOUNTS[@]}" -v "$HW6:/hw6:z" localhost/ww3ds-clang bash -c '
+podman run --rm --memory=3g --memory-swap=3g --cpus=4 -e N3DS_RENDER_OPT -e N3DS_RENDER_LTO -e N3DS_PGO -e N3DS_GAME_FLAGS -e N3DS_GX_INLINE -e SOURCE_DATE_EPOCH -e N3DS_EVENT_INDIRECT -v "$SW:/work:z" -v "$here:/arm:z" "${PUBMOUNTS[@]}" -v "$HW6:/hw6:z" localhost/ww3ds-clang bash -c '
 set -e
 mode='"$mode"'
 export DEVKITPRO=/opt/devkitpro DEVKITARM=/opt/devkitpro/devkitARM
@@ -235,11 +235,17 @@ if [ "$mode" != relink ]; then
     use) pgo="-fprofile-use=/arm/pgo/ww.profdata -Wno-profile-instr-unprofiled -Wno-profile-instr-out-of-date -Wno-profile-instr-missing" ;;
   esac
   pgosum=""; if [ "${N3DS_PGO:-}" = use ]; then pgosum=$(md5sum /arm/pgo/ww.profdata | cut -c1-32); fi
-  pgostamp="${N3DS_PGO:-none} $pgosum"
+  # (Claude v137) game code flags added to every unit; part of the stamp, so changing them rebuilds every unit
+  gameflags="${N3DS_GAME_FLAGS--fomit-frame-pointer}"
+  # (Claude v138) inline GX FIFO writers in game units (src/gx_inline_3ds.h); N3DS_GX_INLINE=0 = the out-of-line Aurora calls
+  gxinline=""; [ "${N3DS_GX_INLINE:-1}" = 1 ] && gxinline="-include /arm/src/gx_inline_3ds.h"
+  gxsum=""; [ -n "$gxinline" ] && gxsum=$(md5sum /arm/src/gx_inline_3ds.h | cut -c1-12)
+  pgostamp="${N3DS_PGO:-none} $pgosum $gameflags $gxsum"
   pgoforce=false; [ "$(cat /arm/obj/.pgo-stamp 2>/dev/null)" = "$pgostamp" ] || pgoforce=true
   echo "pgo: mode ${N3DS_PGO:-none} rebuild-all $pgoforce"
   while IFS= read -r line; do
-    line="$line $pgo"
+    line="$line $pgo $gameflags"
+    case "$line" in *"-c /work/build/native-linux/_deps/aurora-src/lib/"*|*"-c /arm/gen/"*) ;; *) line="$line $gxinline" ;; esac
     o=$(echo "$line" | grep -o "\-o [^ ]*" | cut -c4-)
     s=$(echo "$line" | grep -o "\-c [^ ]*" | cut -c4-)
     grep -qx "$(basename "$o")" /arm/exclude.txt && continue
@@ -251,6 +257,11 @@ if [ "$mode" != relink ]; then
     esac
     # Item B: same output objects, generated SDK input and explicit header deps.
     typed_dep=false
+    # (Claude v137) 3DS copies of Aurora sources compiled in place of the originals (same output object)
+    case "$s" in
+      /work/build/native-linux/_deps/aurora-src/lib/dolphin/mtx/mtx.c)
+        line=$(echo "$line" | sed "s|$s|/arm/src/mtx_3ds.c|"); s=/arm/src/mtx_3ds.c ;;
+    esac
     case "$s" in
       /work/build/native-linux/_deps/aurora-src/lib/dolphin/gx/*.cpp)
         replacement=/arm/gen/typed_gx/$(basename "$s")

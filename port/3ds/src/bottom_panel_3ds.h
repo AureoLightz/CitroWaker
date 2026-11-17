@@ -141,7 +141,14 @@ inline void composeLeft(citro_settings::Canvas& c,const uint16_t* cloth,const St
 // Whole picture into `out` (framebuffer order, 240x320). mapOwned: only the column is meaningful.
 inline void compose(uint16_t* out,const uint16_t* cloth,const State& s){
   citro_settings::Canvas c{out};
-  if(!s.mapOwned)composeLeft(c,cloth,s);
+  if(!s.mapOwned){
+    // (Claude v137) the left area depends only on the Settings button's pressed state: composed once per state (glyph
+    // drawing was the render thread's largest single cost when the FPS text / HUD fade changed the state), then copied
+    static uint16_t cache[kGpuRows*240];static int key=-1;
+    const int k=s.settingsPressed?1:0;
+    if(key!=k){citro_settings::Canvas cc{cache};composeLeft(cc,cloth,s);key=k;}
+    std::memcpy(out,cache,sizeof cache);
+  }
   composeColumn(c,s);
   const uint8_t alpha=n3ds_ui::Presentation{s.presentation}.alpha();
   // HUD fading in/out (cutscenes, pause, scene changes): the picture fades over black with it. The Settings

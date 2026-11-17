@@ -28,6 +28,28 @@ Process and render run on separate cores, but they still wait on each other and 
 
 In an emulator profile of the same area, display-list traffic accounts for about two-thirds of process time, and nearly all of it comes from the game's model renderer (J3D).
 
+### v137–v138: less game-thread work per tick
+
+All exact (the game behaves the same; the GX command stream is byte-identical):
+
+- `MTXConcat` reads its 24 inputs once instead of re-reading them after every store (about 3x fewer instructions; the J3D joint walk's top cost).
+- Game code is built without a frame pointer.
+- GX FIFO writers (`GXPosition3f32`, `GXCmd1u32`, ...) are inlined into the game: one bounds check and a store instead of two calls per value.
+- The compiler no longer zero-fills joint and 2D pane matrices that are completely written before use.
+- A per-frame busy loop in `JFWDisplay::calcCombinationRatio` (one step per video interval) is now one division.
+- Collision scans (wall, ground, roof, line, sphere) stop at the last used collision slot instead of walking all 256.
+- The bottom-screen panel's static left side is drawn once and copied, instead of redrawn with its text whenever the FPS readout changes.
+
+| Emulator, Outset, game-thread ms per tick (two runs each) | v136 | v138 |
+|---|---|---|
+| Actor update (`execute-all`) | 4.80 | 4.17 |
+| Collision (`bg-acch`) | 1.16 | 0.90 |
+| J3D joint/matrix work (`J3D-calc`) | 1.38 | 1.14 |
+| Model draw lists (`J3D-drawBuffer`) | 1.98 | 1.67 |
+| Painter | 5.42 | 4.86 |
+
+The time saved shows up as waiting at frame end for the renderer (`after-draw` 0.6 → 1.5 ms), so in this scene the renderer side is now the limit. Console result pending.
+
 ## What has been tried
 
 | Change | Result |
