@@ -18,6 +18,8 @@ import sys
 import tempfile
 import threading
 import time
+import ssl
+import urllib.error
 import urllib.request
 from pathlib import Path
 
@@ -155,19 +157,60 @@ def find_cia() -> Path | None:
     return None
 
 
+_CA_FILES = (
+    "/etc/pki/tls/certs/ca-bundle.crt",       # Fedora, Bazzite, SteamOS-like, RHEL
+    "/etc/ssl/certs/ca-certificates.crt",     # Debian, Ubuntu, Arch, Mint
+    "/etc/ssl/ca-bundle.pem",                 # openSUSE
+    "/etc/ssl/cert.pem",                      # Alpine, macOS, BSD
+    "/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem",
+)
+
+
+def _ssl_context() -> ssl.SSLContext:
+    """Certificate roots for the download. The one-file Linux build carries an OpenSSL that looks where the build
+    system kept its CA bundle, which other distributions do not have: load the system bundle from where this
+    distribution keeps it, else the certifi bundle packed into the installer."""
+    ctx = ssl.create_default_context()
+    if ctx.cert_store_stats().get("x509_ca", 0):
+        return ctx
+    for f in [os.environ.get("SSL_CERT_FILE", "")] + list(_CA_FILES):
+        if f and os.path.isfile(f):
+            try:
+                ctx.load_verify_locations(cafile=f)
+                if ctx.cert_store_stats().get("x509_ca", 0):
+                    return ctx
+            except (ssl.SSLError, OSError):
+                pass
+    try:
+        import certifi  # packed by build_release.sh
+        ctx.load_verify_locations(cafile=certifi.where())
+    except Exception:
+        pass
+    return ctx
+
+
+def _open(req, timeout):
+    return urllib.request.urlopen(req, timeout=timeout, context=_ssl_context())
+
+
 def download_latest_cia(dest_dir: Path, log) -> Path:
     """Fetches CitroWaker.cia from the newest GitHub release (only when the player asks for it)."""
     url = f"https://api.github.com/repos/{REPO}/releases/latest"
     req = urllib.request.Request(url, headers={"Accept": "application/vnd.github+json", "User-Agent": "CitroWaker-Installer"})
-    with urllib.request.urlopen(req, timeout=30) as r:
-        info = json.load(r)
+    try:
+        with _open(req, 30) as r:
+            info = json.load(r)
+    except urllib.error.HTTPError as e:
+        if e.code == 404:
+            raise Problem("No CitroWaker release is published yet. Put CitroWaker.cia next to the installer and try again.")
+        raise
     asset = next((a for a in info.get("assets", []) if a.get("name") == CIA_NAME), None)
     if not asset:
         raise Problem("The latest release has no CitroWaker.cia. Download it from the releases page by hand.")
     dest = dest_dir / CIA_NAME
     log(f"Downloading {CIA_NAME} ({info.get('tag_name', 'latest')})...")
     req = urllib.request.Request(asset["browser_download_url"], headers={"User-Agent": "CitroWaker-Installer"})
-    with urllib.request.urlopen(req, timeout=60) as r, open(dest.with_suffix(".part"), "wb") as f:
+    with _open(req, 60) as r, open(dest.with_suffix(".part"), "wb") as f:
         shutil.copyfileobj(r, f)
     os.replace(dest.with_suffix(".part"), dest)
     return dest

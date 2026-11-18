@@ -19,11 +19,11 @@ if [ "$WHAT" = linux ] || [ "$WHAT" = all ]; then
   "$ENGINE" run --rm -v "$ROOT:/src:z" -w /src docker.io/library/ubuntu:22.04 bash -euc "
     export DEBIAN_FRONTEND=noninteractive
     apt-get update -qq && apt-get install -y -qq python3 python3-pip python3-tk g++ binutils >/dev/null
-    pip3 install -q pyinstaller==6.11.1
+    pip3 install -q pyinstaller==6.11.1 certifi==2024.8.30
     mkdir -p /tmp/b && g++ -std=c++17 -O2 -pthread -static-libstdc++ -static-libgcc -I$TP/src $SRCS -o /tmp/b/mktexpack
     pyinstaller --noconfirm --clean --onefile --windowed --name CitroWaker-Installer-linux-x86_64 \
       --distpath /src/installer/dist --workpath /tmp/b/work --specpath /tmp/b \
-      --add-binary /tmp/b/mktexpack:. $PYI_DATA /src/installer/citrowaker_installer.py >/dev/null"
+      --add-binary /tmp/b/mktexpack:. --collect-data certifi $PYI_DATA /src/installer/citrowaker_installer.py >/dev/null"
   echo "built $OUT/CitroWaker-Installer-linux-x86_64"
 fi
 
@@ -34,11 +34,11 @@ if [ "$WHAT" = windows ] || [ "$WHAT" = all ]; then
     x86_64-w64-mingw32-g++ -std=c++17 -O2 -static -I$TP/src $SRCS -o /src/installer/build-win/mktexpack.exe
     true"
   "$ENGINE" run --rm -v "$ROOT:/src:z" -w /src docker.io/tobix/pywine:3.12 bash -euc "
-    wine python -m pip install -q pyinstaller==6.11.1 2>/dev/null
+    wine python -m pip install -q pyinstaller==6.11.1 certifi==2024.8.30 2>/dev/null
     wine pyinstaller --noconfirm --clean --onefile --windowed --name CitroWaker-Installer \
       --distpath Z:\\\\src\\\\installer\\\\dist --workpath Z:\\\\tmp\\\\w --specpath Z:\\\\tmp\\\\w \
       --add-binary 'Z:\\src\\installer\\build-win\\mktexpack.exe;.' \
       --add-data 'Z:\\src\\$TP\\extract_textures.py;texture-pack' --add-data 'Z:\\src\\$TP\\third_party;texture-pack\\third_party' \
-      installer/citrowaker_installer.py 2>&1 | tail -3"
+      --collect-data certifi installer/citrowaker_installer.py 2>&1 | tail -3"
   echo "built $OUT/CitroWaker-Installer.exe"
 fi
