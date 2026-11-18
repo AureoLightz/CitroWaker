@@ -50,26 +50,24 @@ The goal is the original adventure with controls and presentation that belong on
 
 ## Install in three steps
 
-You need a **New** 3DS / 3DS XL / 2DS XL with custom firmware and [FBI](https://github.com/Steveice10/FBI), and **your own** USA disc image of *The Wind Waker* (`GZLE01`, plain `.iso`). Nothing from the game is downloaded or included.
+**You need:** a **New** 3DS / 3DS XL / 2DS XL with custom firmware and [FBI](https://github.com/Steveice10/FBI), and **your own** USA disc image of *The Wind Waker* (`GZLE01`, plain `.iso`). Nothing from the game is downloaded or included.
 
 <table>
 <tr>
 <td width="55%">
 
-1. **Download** the installer for your PC and `CitroWaker.cia` from [**Releases**](https://github.com/AureoLightz/CitroWaker/releases) into one folder.
-2. **Run the installer**, choose your disc image, plug in the SD card (it is found automatically) and press **Install**. It checks your disc, copies everything to the card and can build the optional texture pack from your disc.
-3. **On the 3DS**, open FBI › *SD* › *cia* › `CitroWaker.cia` › *Install CIA*, then start CitroWaker from the HOME Menu.
+1. **Download one file** for your PC from [**Releases**](https://github.com/AureoLightz/CitroWaker/releases):
+   **Windows** `CitroWaker-Installer.exe` · **Linux** `CitroWaker-Installer-linux-x86_64`
+2. **Run it**, choose your disc image, plug in your SD card and press **Install**. The game is built into the installer.
+3. **On the 3DS**, open **FBI › SD › cia › `CitroWaker.cia` › Install CIA**, then start **CitroWaker** from the HOME Menu.
 
-| PC | Download |
-| :--- | :--- |
-| Windows 10/11 | `CitroWaker-Installer.exe` |
-| Linux x86-64 | `CitroWaker-Installer-linux-x86_64` |
+**Updating?** Download the new installer and run it again. Your saves are kept and the disc image is not copied twice.
 
-Updating? Run the installer again: your saves in `/3ds/ww3ds/user/` are never touched and a disc image already on the card is not copied twice. [Installer details & command line →](installer/README.md)
+<sub>[Installer details & command line →](installer/README.md)</sub>
 
 </td>
 <td width="45%" align="center">
-<img src="assets/installer.png" alt="The CitroWaker Installer window: disc image, SD card and game file steps with an Install button" width="100%"><br>
+<img src="assets/installer.png" alt="The CitroWaker Installer window: disc image and SD card steps with an Install button" width="100%"><br>
 <sub>The installer (Linux shown; Windows looks the same).</sub>
 </td>
 </tr>

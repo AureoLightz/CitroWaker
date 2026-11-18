@@ -1,6 +1,7 @@
 #!/bin/bash
 # Builds the CitroWaker Installer for Linux and Windows in containers (rootless podman; with docker add --user); no host toolchain needed.
-#   bash installer/build_release.sh [linux|windows|all]
+#   [CIA=path/to/CitroWaker.cia] bash installer/build_release.sh [linux|windows|all]
+# With CIA set (release builds), the game file is built into the installer: players download one file.
 # Output: installer/dist/CitroWaker-Installer-linux-x86_64 and installer/dist/CitroWaker-Installer.exe
 #   Linux:   Ubuntu 22.04 (glibc 2.35) + PyInstaller, mktexpack built with g++ (static libstdc++).
 #   Windows: mktexpack.exe cross-built with MinGW-w64 (fully static), PyInstaller under Wine (tobix/pywine).
@@ -14,6 +15,12 @@ WHAT=${1:-all}
 TP=tools/texture-pack
 SRCS="$TP/mktexpack.cpp $TP/src/texconv.cpp $TP/src/texfit.cpp $TP/src/texmap.cpp $TP/src/texpack.cpp $TP/src/texture_support.cpp"
 PYI_DATA="--add-data /src/$TP/extract_textures.py:texture-pack --add-data /src/$TP/third_party:texture-pack/third_party"
+WIN_CIA=""
+if [ -n "${CIA:-}" ]; then
+  mkdir -p installer/build-cia && cp "$CIA" installer/build-cia/CitroWaker.cia
+  PYI_DATA="$PYI_DATA --add-data /src/installer/build-cia/CitroWaker.cia:."
+  WIN_CIA="--add-data 'Z:\\src\\installer\\build-cia\\CitroWaker.cia;.'"
+fi
 
 if [ "$WHAT" = linux ] || [ "$WHAT" = all ]; then
   "$ENGINE" run --rm -v "$ROOT:/src:z" -w /src docker.io/library/ubuntu:22.04 bash -euc "
@@ -39,6 +46,6 @@ if [ "$WHAT" = windows ] || [ "$WHAT" = all ]; then
       --distpath Z:\\\\src\\\\installer\\\\dist --workpath Z:\\\\tmp\\\\w --specpath Z:\\\\tmp\\\\w \
       --add-binary 'Z:\\src\\installer\\build-win\\mktexpack.exe;.' \
       --add-data 'Z:\\src\\$TP\\extract_textures.py;texture-pack' --add-data 'Z:\\src\\$TP\\third_party;texture-pack\\third_party' \
-      --collect-data certifi installer/citrowaker_installer.py 2>&1 | tail -3"
+      $WIN_CIA --collect-data certifi installer/citrowaker_installer.py 2>&1 | tail -3"
   echo "built $OUT/CitroWaker-Installer.exe"
 fi

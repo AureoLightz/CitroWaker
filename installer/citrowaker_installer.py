@@ -24,7 +24,7 @@ import urllib.request
 from pathlib import Path
 
 APP = "CitroWaker Installer"
-VERSION = "1.0.0"
+VERSION = "0.5"
 REPO = "AureoLightz/CitroWaker"
 ISO_SIZE = 1_459_978_240            # every full GameCube disc image
 GAME_DIR = Path("3ds") / "ww3ds"    # the port's data folder on the SD card
@@ -149,12 +149,19 @@ def find_sd_cards() -> list[Path]:
     return found
 
 
+def bundled_cia() -> Path | None:
+    """The CitroWaker.cia built into this installer (release builds carry it: one download)."""
+    p = resource_dir() / CIA_NAME
+    return p if getattr(sys, "frozen", False) and p.is_file() else None
+
+
 def find_cia() -> Path | None:
+    """A CitroWaker.cia placed next to the installer wins (a newer game file); otherwise the built-in one."""
     for d in (app_dir(), app_dir().parent, Path.cwd()):
         p = d / CIA_NAME
         if p.is_file():
             return p
-    return None
+    return bundled_cia()
 
 
 _CA_FILES = (
@@ -407,7 +414,9 @@ def run_gui():
     outer = ttk.Frame(root, padding=18)
     outer.pack(fill="both", expand=True)
     ttk.Label(outer, text="CitroWaker for New Nintendo 3DS", style="Title.TLabel").pack(anchor="w")
-    ttk.Label(outer, text="Three steps: choose your disc image, choose your SD card, press Install.",
+    builtin = bundled_cia() is not None and find_cia() == bundled_cia()
+    ttk.Label(outer, text=("Choose your disc image, plug in your SD card, press Install." if builtin else
+                           "Three steps: choose your disc image, choose your SD card, press Install."),
               wraplength=600).pack(anchor="w", pady=(2, 12))
 
     def step(number: int, title: str, var: tk.StringVar, browse, extra=None):
@@ -462,8 +471,12 @@ def run_gui():
     iso_msg = step(1, "Your Wind Waker disc image (USA, .iso)", iso_var, pick_iso)
     sd_msg = step(2, "Your 3DS SD card", sd_var, pick_sd,
                   extra=lambda row: ttk.Button(row, text="Find", command=detect).pack(side="left", padx=(6, 0)))
-    cia_msg = step(3, "CitroWaker game file (CitroWaker.cia)", cia_var, pick_cia,
-                   extra=lambda row: ttk.Button(row, text="Download", command=download).pack(side="left", padx=(6, 0)))
+    if builtin:   # the game file is inside this installer: no third step
+        cia_msg = ttk.Label(outer, text="", wraplength=600)
+        cia_msg.pack(anchor="w", pady=(2, 0))
+    else:
+        cia_msg = step(3, "CitroWaker game file (CitroWaker.cia)", cia_var, pick_cia,
+                       extra=lambda row: ttk.Button(row, text="Download", command=download).pack(side="left", padx=(6, 0)))
 
     opts = ttk.Frame(outer)
     opts.pack(fill="x", pady=(8, 4))
@@ -586,7 +599,7 @@ def run_cli(argv: list[str]) -> int:
     p = argparse.ArgumentParser(prog="citrowaker-installer", description=__doc__)
     p.add_argument("--iso", type=Path, required=True, help="your USA Wind Waker disc image (GZLE01 .iso)")
     p.add_argument("--sd", type=Path, help="the 3DS SD card's top folder (default: the one found)")
-    p.add_argument("--cia", type=Path, help="CitroWaker.cia (default: next to the installer)")
+    p.add_argument("--cia", type=Path, help="CitroWaker.cia (default: next to the installer, else the one built in)")
     p.add_argument("--texture-pack", action="store_true", help="also build the texture pack")
     a = p.parse_args(argv)
     sd = a.sd or (find_sd_cards() or [None])[0]
@@ -635,6 +648,7 @@ def self_test() -> int:
         print("converter runs: " + ("ok" if "usage" in (r.stderr + r.stdout) else "NO"))
         ok &= "usage" in (r.stderr + r.stdout)
     ok &= bool(tools and conv)
+    print("built-in CitroWaker.cia:", bundled_cia() or "none")
     print("SD cards found:", [str(p) for p in find_sd_cards()])
     return 0 if ok else 1
 

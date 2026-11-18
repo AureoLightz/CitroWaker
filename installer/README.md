@@ -15,8 +15,9 @@ Afterwards install the CIA with FBI on the console and start CitroWaker from the
 | Windows 10/11 (64-bit) | `CitroWaker-Installer.exe` |
 | Linux x86-64 (glibc 2.35+, e.g. Ubuntu 22.04, Fedora 36+) | `CitroWaker-Installer-linux-x86_64` (`chmod +x` it first) |
 
-Put `CitroWaker.cia` from the same release next to the installer and it is picked up automatically; otherwise use
-**Browse** or **Download** (fetches it from this repository's newest release, only when you press the button).
+Release installers (0.5 and later) carry `CitroWaker.cia` inside them, so that one file is all you download. A `CitroWaker.cia`
+placed next to the installer is used instead (for a newer game file); an installer without a built-in CIA shows a third
+step with **Browse** and **Download** (fetches it from this repository's newest release, only when you press the button).
 
 ## What it checks and what it never does
 
