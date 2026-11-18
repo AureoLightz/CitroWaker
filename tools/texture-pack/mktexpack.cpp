@@ -3,6 +3,15 @@
 // Every texture is converted with the run-time options of the 3DS renderer (Renderer3ds texCache: no ETC1, lossy fallback allowed, exact error)
 // for each binding variant the game may use: needAlpha 0/1, level count {1, all stored, the BTI's max LOD}, and every wrap mode on axes where it
 // matters. --verify re-reads the written pack and compares every record with a fresh conversion.
+#include <fcntl.h>
+#ifdef _WIN32
+#include <io.h>
+#else
+#include <unistd.h>
+#endif
+#ifndef O_BINARY
+#define O_BINARY 0
+#endif
 #include <algorithm>
 #include <atomic>
 #include <cmath>
@@ -158,7 +167,9 @@ int main(int argc, char** argv) {
   std::sort(recs.begin(), recs.end(), [](const Out* a, const Out* b) { return a->rec.key.hash() < b->rec.key.hash(); });
   for (size_t i = 1; i < recs.size(); i++) if (recs[i]->rec.key.hash() == recs[i - 1]->rec.key.hash()) { std::fprintf(stderr, "64-bit key hash collision: the index cannot tell two keys apart\n"); return 1; }
 
-  FILE* f = std::fopen(argv[2], "wbx");
+  // exclusive create: fopen's "x" mode is C11 and Windows' msvcrt (MinGW build) rejects it with EINVAL
+  const int fd = ::open(argv[2], O_WRONLY | O_CREAT | O_EXCL | O_BINARY, 0644);
+  FILE* f = fd >= 0 ? ::fdopen(fd, "wb") : nullptr;
   if (!f) { std::perror(argv[2]); return 1; }
   TexPackHeader h; h.count = uint32_t(recs.size()); h.optionsSig = texPackOptionsSig(true, g_etc1, false);
   std::vector<TexPackIndex> index(recs.size());
