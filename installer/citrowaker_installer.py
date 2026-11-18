@@ -195,18 +195,23 @@ def _open(req, timeout):
 
 def download_latest_cia(dest_dir: Path, log) -> Path:
     """Fetches CitroWaker.cia from the newest GitHub release (only when the player asks for it)."""
-    url = f"https://api.github.com/repos/{REPO}/releases/latest"
-    req = urllib.request.Request(url, headers={"Accept": "application/vnd.github+json", "User-Agent": "CitroWaker-Installer"})
-    try:
+    def fetch(url):
+        req = urllib.request.Request(url, headers={"Accept": "application/vnd.github+json", "User-Agent": "CitroWaker-Installer"})
         with _open(req, 30) as r:
-            info = json.load(r)
+            return json.load(r)
+    has_cia = lambda rel: any(a.get("name") == CIA_NAME for a in rel.get("assets", []))
+    # "latest" leaves pre-releases out; until a full release exists, the newest release (pre-releases too) that carries the CIA
+    try:
+        info = fetch(f"https://api.github.com/repos/{REPO}/releases/latest")
     except urllib.error.HTTPError as e:
-        if e.code == 404:
-            raise Problem("No CitroWaker release is published yet. Put CitroWaker.cia next to the installer and try again.")
-        raise
-    asset = next((a for a in info.get("assets", []) if a.get("name") == CIA_NAME), None)
-    if not asset:
-        raise Problem("The latest release has no CitroWaker.cia. Download it from the releases page by hand.")
+        if e.code != 404:
+            raise
+        info = {}
+    if not has_cia(info):
+        info = next((r for r in fetch(f"https://api.github.com/repos/{REPO}/releases?per_page=20") if not r.get("draft") and has_cia(r)), None)
+        if info is None:
+            raise Problem("No CitroWaker release with CitroWaker.cia is published yet. Put CitroWaker.cia next to the installer and try again.")
+    asset = next(a for a in info["assets"] if a.get("name") == CIA_NAME)
     dest = dest_dir / CIA_NAME
     log(f"Downloading {CIA_NAME} ({info.get('tag_name', 'latest')})...")
     req = urllib.request.Request(asset["browser_download_url"], headers={"User-Agent": "CitroWaker-Installer"})
