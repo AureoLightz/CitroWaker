@@ -1,6 +1,29 @@
 # Performance
 
-Latest console measurement: build v132 on a physical New 3DS (November 2026). Emulator figures are labelled as such.
+Latest console measurement: build v148o on a physical New 3DS (November 2026). Emulator figures are labelled as such.
+
+## Current state (v148)
+
+| Console, busy Outset | v132 | v148e | v148o (busiest view, ~540 draws) |
+|---|---|---|---|
+| Frames per second | ~12 | ~15 (heavy village frames 7–18) | ~9–10 at 61% game speed |
+| Render core (GPU work building) | ~47 ms | 50–55 ms | ~108 ms per painted frame |
+| Decoder core (GameCube command stream) | ~44 ms | — | ~92 ms |
+
+The busiest view is **renderer-bound**: the game thread never waits on anything else. On v148o the draw-replay cache was starved of memory (pinned at its 512 KB floor), so most draws took the slow path. v148s freed about 4 MB for it.
+
+Renderer work since then (emulator, exact; console results pending):
+
+| Change | Scene | Before → after |
+|---|---|---|
+| v148y particle colour segments | effect-heavy (Siren) | render 23.2 → 10.9 ms, decoder 14.6 → 11.1 ms, draw events 706 → 237 |
+| v148w shape layout memo | Outset | decoder 5.61 → 5.08 ms |
+| v148v cached material hashes, pooled allocations | Outset | decoder −4.3% |
+| v148t SDK register shadow | Outset | game draw 5.2 → 4.1 ms/tick, decoder 12.2 → 10.5 ms |
+
+Next target, from an emulator profile of a busy Outset view: about 45 draws per frame whose geometry is rebuilt every frame (sea surface, effects). They cannot use the replay cache and take 20–40% of render time.
+
+## History
 
 ## Where the time goes (console, heavy Outset gameplay)
 

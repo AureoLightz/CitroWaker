@@ -20,9 +20,10 @@
   <img alt="Installer for Windows and Linux" src="https://img.shields.io/badge/installer-Windows%20%C2%B7%20Linux-c9b673">
   <img alt="Bring your own USA disc" src="https://img.shields.io/badge/disc-your%20own%20GZLE01-30535d">
   <img alt="MIT licence for project code" src="https://img.shields.io/badge/licence-MIT-0e2530">
+  <a href="https://github.com/AureoLightz/CitroWaker/releases"><img alt="Latest release" src="https://img.shields.io/github/v/release/AureoLightz/CitroWaker?include_prereleases&label=release&color=3a7d8c"></a>
 </p>
 
-> **Early release.** Gameplay runs on real New 3DS hardware, with sound, saves and the touch screen. It is **not full speed yet** (heavy scenes run around 12 fps on console) and some console rendering faults remain; full-game completion is unverified. Keep backups of `/3ds/ww3ds/user/`.
+> **Early release.** Gameplay runs on real New 3DS hardware, with sound, saves and the touch screen. It is **not full speed yet**: on console, light areas are playable and the busiest Outset views run at roughly 9–15 fps and some console rendering faults remain; full-game completion is unverified. Keep backups of `/3ds/ww3ds/user/`.
 
 ## The project
 *AI DISCLAIMER* Codex and Claude Code were used for a solid chunk of this, as a college student i literally do not have the time to do it all alone.
@@ -100,14 +101,25 @@ Buttons follow the game's own HUD: usable when the game allows the action, greye
 | :--- | :--- |
 | **Game & audio** | Boots and reaches gameplay on real New 3DS; sound and physical controls run. |
 | **Graphics** | Custom GX-to-PICA renderer. Some console depth, cloud and shadow faults remain under investigation. |
-| **Performance** | Not yet at speed: heavy scenes on console measure about 12 fps (80 ms frames); the GPU command translation is the bottleneck and the main focus. Console numbers in [Performance](docs/PERFORMANCE.md); emulator FPS is not console FPS. |
+| **Performance** | Not yet at speed. Busiest Outset view on console: ~9–10 fps at ~61% game speed (v148o); typical heavy Outset ~15 fps (v148e). The renderer core (building 3DS GPU work) is the current bottleneck. Details in [Performance](docs/PERFORMANCE.md); emulator FPS is not console FPS. |
 | **Saving** | SD-backed memory cards; the settings menu now saves on hardware. Keep backups of `/3ds/ww3ds/user/`. |
 | **Touch & QoL** | Bottom-screen touch panel and optional live map; QoL and gyro options are opt-in. |
 | **Release** | Installer, CIA, port sources and host tests published. |
 
+### Since 0.5 (development builds, not yet released)
+
+Renderer and decoder work aimed at the console bottleneck. All changes are exact: frames are checked pixel-identical or verified draw by draw.
+
+- **Particle batching:** fire, smoke and spray particles that differ only in colour now share one draw. Effect-heavy scene: render time per frame **−53%**, decoder **−24%** (emulator, 23.2 → 10.9 ms).
+- **Draw replay:** unchanged draws are re-sent from the previous frame's recorded GPU commands; the replay cache got ~4 MB more memory on console.
+- **Less work per draw:** shape layouts are remembered, per-draw planning is allocated only when needed, and cache flushes go straight to the kernel.
+- **Game thread:** redundant GPU register writes are dropped before they are sent (~11,000 per frame) and hot code is laid out in one block.
+
+<sub>Percentages are emulator measurements; console results come from play sessions and are added to <a href="docs/PERFORMANCE.md">Performance</a> as they arrive.</sub>
+
 ### Where we're heading
 
-1. **Every-frame performance:** a constant 30 fps on console by cutting command decoding, memory traffic and draw preparation.
+1. **Every-frame performance:** 20 fps constant first, then 30 fps, by cutting draw preparation, command decoding and memory traffic. Next up: replaying draws whose geometry changes every frame (sea surface, effects), currently 20–40% of render time.
 2. **Correctness and stability:** console rendering faults and scene-change stalls.
 3. **Handheld polish:** live map on by default once its video memory cost is gone.
 
