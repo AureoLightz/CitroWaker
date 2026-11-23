@@ -1,8 +1,20 @@
 # Performance
 
-Latest console measurement: build v148o on a physical New 3DS (November 2026). Emulator figures are labelled as such.
+## Current development measurements
 
-## Current state (v148)
+The public download is the [v0.5 preview](https://github.com/AureoLightz/CitroWaker/releases/tag/v0.5). The measurements below come from November 22 development builds. The workloads, settings and measurement windows matter, especially when comparing locations.
+
+| Evidence | Scene and settings | Result |
+|---|---|---|
+| Physical New 3DS play session | Dragon Roost summit, adaptive presentation enabled | A late 300-tick window ran at 98% game speed and presented 15.2 FPS. The same session later stalled during combat. |
+| Azahar live timing | Wide Outset, full-detail settings, frame skipping disabled | 49.46 ms per frame in emulated 3DS time (20.22 FPS), with 6.62 FPS observed on the host at 33% emulation speed. |
+| Azahar live timing | Main lava room, full detail, frame skipping disabled | 114.94 ms per frame (8.70 FPS emulated), with 2.88 FPS observed on the host at 33% emulation speed. |
+| Azahar paired experiment | Main lava room, structural fog template reuse | 130.48 → 107.02 ms average. The worst sampled 60-frame block fell from 253.9 to 141.0 ms. No paired hardware measurement yet. |
+| Azahar paired experiment | Main lava room, grouped prepared GPU commands | 114.94 → 124.76 ms. The tested feature remains off by default. Captured colour and depth matched, but this path reached few live draws. |
+
+The target is 100% game speed and 30 presented frames per second on a New 3DS, with all effects and no frame skipping. One frame has a 33.33 ms budget. In the full-detail lava test, both GX decoding and the renderer independently exceeded it. The benchmark reports deadline misses and worst frames alongside average FPS.
+
+## Earlier console results (v148)
 
 | Console, busy Outset | v132 | v148e | v148o (busiest view, ~540 draws) |
 |---|---|---|---|
@@ -38,7 +50,7 @@ The target is a constant 30 FPS (33 ms per frame). Every stage above is still ov
 
 ### v136: paint pacing no longer rounds down to 15 fps
 
-The game logic always runs at 30 ticks per second; a tick is drawn when the renderer can take it. Until v135 the drawing cadence was a whole number of ticks (every tick = 30 fps, every 2nd = 15 fps), so a renderer needing 34–66 ms per frame always gave 15 fps. v136 paints whenever the renderer's measured cost has been earned (a 40 ms renderer gives 25 fps: 5 of every 6 ticks drawn). On console v132 the game thread slept more than half of the time in those 15 fps windows, so the renderer, not the game, was the limit.
+The pacer targets 30 logic ticks per second and draws a tick when the renderer can take it. The logic rate can still fall below its target in heavy gameplay. Until v135 the drawing cadence was a whole number of ticks (every tick = 30 fps, every 2nd = 15 fps), so a renderer needing 34–66 ms per frame always gave 15 fps. v136 paints whenever the renderer's measured cost has been earned (a 40 ms renderer gives 25 fps: 5 of every 6 ticks drawn). On console v132 the game thread slept more than half of the time in those 15 fps windows, so the renderer, not the game, was the limit.
 
 | Emulator simulation, render cost raised to console level (+30 ms) | Presented | Game speed |
 |---|---|---|
@@ -102,4 +114,4 @@ The model renderer currently describes every model as GameCube commands. The gam
 
 ## Measuring
 
-Builds log per-frame timings to `/3ds/ww3ds/log.txt` (`[present]`, `[3ds] frame`, `[render-split]` lines). Emulator ("virtual") FPS is not console FPS. Azahar has been about 3× optimistic for heavy frames.
+Builds log per-frame timings to `/3ds/ww3ds/log.txt` (`[present]`, `[3ds] frame`, `[render-split]` lines). Emulator ("virtual") FPS is not console FPS. Host FPS also depends on how fast Azahar advances emulated time. Console performance requires a matched run on the hardware.
