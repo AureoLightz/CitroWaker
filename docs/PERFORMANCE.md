@@ -12,6 +12,8 @@ The public download is the [v0.5 preview](https://github.com/AureoLightz/CitroWa
 | Azahar paired experiment | Main lava room, structural fog template reuse | 130.48 → 107.02 ms average. The worst sampled 60-frame block fell from 253.9 to 141.0 ms. No paired hardware measurement yet. |
 | Azahar paired experiment | Main lava room, grouped prepared GPU commands | 114.94 → 124.76 ms. The tested feature remains off by default. Captured colour and depth matched, but this path reached few live draws. |
 
+In a separate full-detail lava room A/B, reusing the already-built GPU plan reduced mean presentation time from 114.82 to 109.72 ms (8.71 to 9.11 FPS in emulated time, 8.81 to 9.07 FPS observed on the host). The three replay captures also matched across all 88 colour and depth buffers. The option remains experimental pending console timing.
+
 The target is 100% game speed and 30 presented frames per second on a New 3DS, with all effects and no frame skipping. One frame has a 33.33 ms budget. In the full-detail lava test, both GX decoding and the renderer independently exceeded it. The benchmark reports deadline misses and worst frames alongside average FPS.
 
 ## Earlier console results (v148)
