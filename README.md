@@ -23,7 +23,7 @@
   <a href="https://github.com/AureoLightz/CitroWaker/releases"><img alt="Latest release" src="https://img.shields.io/github/v/release/AureoLightz/CitroWaker?include_prereleases&label=release&color=3a7d8c"></a>
 </p>
 
-> **Early release.** Gameplay runs on real New 3DS hardware, with sound, saves and the touch screen. It is **not full speed yet**: on console, light areas are playable and the busiest Outset views run at roughly 9–15 fps and some console rendering faults remain; full-game completion is unverified. Keep backups of `/3ds/ww3ds/user/`.
+> **Early preview.** CitroWaker runs on real New Nintendo 3DS hardware. The [v0.5 preview](https://github.com/AureoLightz/CitroWaker/releases/tag/v0.5) includes Windows and Linux installers, a CIA and a source archive. Sustained 30 FPS and full-game completion are still unverified. Keep backups of `/3ds/ww3ds/user/`.
 
 ## The project
 *AI DISCLAIMER* Codex and Claude Code were used for a solid chunk of this, as a college student i literally do not have the time to do it all alone.
@@ -59,7 +59,7 @@ The goal is the original adventure with controls and presentation that belong on
 
 1. **Download one file** for your PC from [**Releases**](https://github.com/AureoLightz/CitroWaker/releases):
    **Windows** `CitroWaker-Installer.exe` · **Linux** `CitroWaker-Installer-linux-x86_64`
-2. **Run it**, choose your disc image, plug in your SD card and press **Install**. The game is built into the installer.
+2. **Run it**, choose your disc image, plug in your SD card and press **Install**. The installer includes the CitroWaker CIA and prepares the SD files from your disc image.
 3. **On the 3DS**, open **FBI › SD › cia › `CitroWaker.cia` › Install CIA**, then start **CitroWaker** from the HOME Menu.
 
 **Updating?** Download the new installer and run it again. Your saves are kept and the disc image is not copied twice.
@@ -101,27 +101,16 @@ Buttons follow the game's own HUD: usable when the game allows the action, greye
 | :--- | :--- |
 | **Game & audio** | Boots and reaches gameplay on real New 3DS; sound and physical controls run. |
 | **Graphics** | Custom GX-to-PICA renderer. Some console depth, cloud and shadow faults remain under investigation. |
-| **Performance** | Not yet at speed. Busiest Outset view on console: ~9–10 fps at ~61% game speed (v148o); typical heavy Outset ~15 fps (v148e). The renderer core (building 3DS GPU work) is the current bottleneck. Details in [Performance](docs/PERFORMANCE.md); emulator FPS is not console FPS. |
+| **Performance** | Frame rate and game speed vary by area. CPU-side draw preparation and GX decoding both exceed the 33.33 ms frame budget in demanding tests. See the [console and emulator measurements](docs/PERFORMANCE.md). |
 | **Saving** | SD-backed memory cards; the settings menu now saves on hardware. Keep backups of `/3ds/ww3ds/user/`. |
 | **Touch & QoL** | Bottom-screen touch panel and optional live map; QoL and gyro options are opt-in. |
-| **Release** | Installer, CIA, port sources and host tests published. |
+| **Release** | [v0.5 preview](https://github.com/AureoLightz/CitroWaker/releases/tag/v0.5) includes both installers, a CIA, checksums and a source archive. Development measurements below use newer local builds. |
 
-### Since 0.5 (development builds, not yet released)
+### Current development
 
-Renderer and decoder work aimed at the console bottleneck. All changes are exact: frames are checked pixel-identical or verified draw by draw.
-
-- **Particle batching:** fire, smoke and spray particles that differ only in colour now share one draw. Effect-heavy scene: render time per frame **−53%**, decoder **−24%** (emulator, 23.2 → 10.9 ms).
-- **Draw replay:** unchanged draws are re-sent from the previous frame's recorded GPU commands; the replay cache got ~4 MB more memory on console.
-- **Less work per draw:** shape layouts are remembered, per-draw planning is allocated only when needed, and cache flushes go straight to the kernel.
-- **Game thread:** redundant GPU register writes are dropped before they are sent (~11,000 per frame) and hot code is laid out in one block.
-
-<sub>Percentages are emulator measurements; console results come from play sessions and are added to <a href="docs/PERFORMANCE.md">Performance</a> as they arrive.</sub>
-
-### Where we're heading
-
-1. **Every-frame performance:** 20 fps constant first, then 30 fps, by cutting draw preparation, command decoding and memory traffic. Next up: replaying draws whose geometry changes every frame (sea surface, effects), currently 20–40% of render time.
-2. **Correctness and stability:** console rendering faults and scene-change stalls.
-3. **Handheld polish:** live map on by default once its video memory cost is gone.
+- Reuse of unchanged geometry and recorded GPU commands is already in use. New prepared-command experiments preserve the captured output, but their limited coverage made them slower in live lava-room tests. They remain off by default.
+- In the main Dragon Roost Cavern lava room, reusing fog shader templates reduced a heavy emulator window from 130.48 to 107.02 ms per frame. The New 3DS speedup is still unmeasured.
+- The performance target is **30 presented FPS at 100% game speed**, preserving effects and rendering every frame. Hardware stability work includes a reported freeze during combat at the Dragon Roost summit.
 
 ## Source and tools
 
