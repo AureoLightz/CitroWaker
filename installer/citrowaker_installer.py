@@ -24,7 +24,7 @@ import urllib.request
 from pathlib import Path
 
 APP = "CitroWaker Installer"
-VERSION = "1.0.1"
+VERSION = "1.0.2"
 REPO = "AureoLightz/CitroWaker"
 ISO_SIZE = 1_459_978_240            # every full GameCube disc image
 GAME_DIR = Path("3ds") / "ww3ds"    # the port's data folder on the SD card
