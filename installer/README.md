@@ -35,7 +35,7 @@ CitroWaker-Installer --iso GZLE01.iso [--sd /path/to/card] [--cia CitroWaker.cia
 CitroWaker-Installer --self-test
 ```
 
-From source (Python 3.10+ with Tk): `python3 installer/citrowaker_installer.py`. The texture pack also needs the converter built
+From source (Python 3.10+ with Tk): `python3 installer/citrowaker_installer.py`. This is also the way on **macOS**: put `CitroWaker.cia` from the release next to the script and run `python3 citrowaker_installer.py --iso GZLE01.iso --sd /Volumes/YOUR_SD_CARD` (SD cards under `/Volumes` with a `Nintendo 3DS` folder are also found on their own). The texture pack also needs the converter built
 with `python3 tools/texture-pack/build.py`.
 
 ## Building the release programs

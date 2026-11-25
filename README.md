@@ -62,6 +62,8 @@ The goal is the original adventure with controls and presentation that belong on
 2. **Run it**, choose your disc image, plug in your SD card and press **Install**. The installer includes the CitroWaker CIA and prepares the SD files from your disc image.
 3. **On the 3DS**, open **FBI › SD › cia › `CitroWaker.cia` › Install CIA**, then start **CitroWaker** from the HOME Menu.
 
+**macOS?** There is no Mac app yet, but the installer runs from Python (preinstalled with Xcode's command line tools, or from python.org). Download `citrowaker_installer.py` from the [installer folder](installer/citrowaker_installer.py) and `CitroWaker.cia` from the release into the same folder, then in Terminal: `python3 citrowaker_installer.py --iso ~/Downloads/GZLE01.iso --sd /Volumes/YOUR_SD_CARD`. Run `python3 citrowaker_installer.py` with no options to open the window instead (needs Python with Tk, e.g. the python.org build). Then do step 3.
+
 **Updating?** Download the new installer and run it again. Your saves are kept and the disc image is not copied twice.
 
 <sub>[Installer details & command line →](installer/README.md)</sub>
