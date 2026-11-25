@@ -23,7 +23,7 @@
   <a href="https://github.com/AureoLightz/CitroWaker/releases"><img alt="Latest release" src="https://img.shields.io/github/v/release/AureoLightz/CitroWaker?include_prereleases&label=release&color=3a7d8c"></a>
 </p>
 
-> **Early preview.** CitroWaker runs on real New Nintendo 3DS hardware. The [v0.5 preview](https://github.com/AureoLightz/CitroWaker/releases/tag/v0.5) includes Windows and Linux installers, a CIA and a source archive. Sustained 30 FPS and full-game completion are still unverified. Keep backups of `/3ds/ww3ds/user/`.
+> **CitroWaker 1.0.** It runs on real New Nintendo 3DS hardware. The [1.0 release](https://github.com/AureoLightz/CitroWaker/releases/tag/v1.0) includes Windows and Linux installers, a CIA and a source archive. Speed is roughly 15–25 FPS depending on the area; 30 FPS is the goal and work continues. Full-game completion is still unverified. Keep backups of `/3ds/ww3ds/user/`.
 
 ## The project
 *AI DISCLAIMER* Codex and Claude Code were used for a solid chunk of this, as a college student i literally do not have the time to do it all alone.
@@ -103,14 +103,14 @@ Buttons follow the game's own HUD: usable when the game allows the action, greye
 | **Graphics** | Custom GX-to-PICA renderer. Some console depth, cloud and shadow faults remain under investigation. |
 | **Performance** | Frame rate and game speed vary by area. CPU-side draw preparation and GX decoding both exceed the 33.33 ms frame budget in demanding tests. See the [console and emulator measurements](docs/PERFORMANCE.md). |
 | **Saving** | SD-backed memory cards; the settings menu now saves on hardware. Keep backups of `/3ds/ww3ds/user/`. |
-| **Touch & QoL** | Bottom-screen touch panel and optional live map; QoL and gyro options are opt-in. |
-| **Release** | [v0.5 preview](https://github.com/AureoLightz/CitroWaker/releases/tag/v0.5) includes both installers, a CIA, checksums and a source archive. Development measurements below use newer local builds. |
+| **Touch & QoL** | Bottom-screen item buttons with icons, two touch item slots (I / II) and the live map; gyro aiming (on by default) and a Gameplay settings tab for sailing speed and QoL options. |
+| **Release** | [1.0](https://github.com/AureoLightz/CitroWaker/releases/tag/v1.0) includes both installers, a CIA, checksums and a source archive. |
 
 ### Current development
 
 - Reuse of unchanged geometry and recorded GPU commands is already in use. New prepared-command experiments preserve the captured output, but their limited coverage made them slower in live lava-room tests. They remain off by default.
 - In the main Dragon Roost Cavern lava room, reusing fog shader templates reduced a heavy emulator window from 130.48 to 107.02 ms per frame. The New 3DS speedup is still unmeasured.
-- The performance target is **30 presented FPS at 100% game speed**, preserving effects and rendering every frame. Hardware stability work includes a reported freeze during combat at the Dragon Roost summit.
+- The performance target is **30 presented FPS at 100% game speed**, preserving effects and rendering every frame. 1.0 fixes the Dragon Roost summit combat freeze and the Gohma boss-room crash.
 
 ## Source and tools
 
